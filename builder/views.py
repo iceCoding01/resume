@@ -97,31 +97,55 @@ def edit_resume(request, slug):
             resume.save()
             messages.success(request, 'Resume updated successfully')
             
-        elif section == 'education' and action == 'add':
-            Education.objects.create(
-                user_profile=profile,
-                institution=request.POST.get('institution'),
-                degree=request.POST.get('degree'),
-                field_of_study=request.POST.get('field_of_study', ''),
-                start_date=request.POST.get('start_date'),
-                end_date=request.POST.get('end_date') or None,
-                description=request.POST.get('description', '')
-            )
-            messages.success(request, 'Education added successfully')
+        elif section == 'education':
+            if action == 'add':
+                Education.objects.create(
+                    user_profile=profile,
+                    institution=request.POST.get('institution'),
+                    degree=request.POST.get('degree'),
+                    field_of_study=request.POST.get('field_of_study', ''),
+                    start_date=request.POST.get('start_date'),
+                    end_date=request.POST.get('end_date') or None,
+                    description=request.POST.get('description', '')
+                )
+                messages.success(request, 'Education added successfully')
+            elif action == 'edit':
+                education = get_object_or_404(Education, id=request.POST.get('id'), user_profile=profile)
+                education.institution = request.POST.get('institution')
+                education.degree = request.POST.get('degree')
+                education.field_of_study = request.POST.get('field_of_study', '')
+                education.start_date = request.POST.get('start_date')
+                education.end_date = request.POST.get('end_date') or None
+                education.description = request.POST.get('description', '')
+                education.save()
+                messages.success(request, 'Education updated successfully')
             
-        elif section == 'experience' and action == 'add':
-            current = 'current' in request.POST
-            Experience.objects.create(
-                user_profile=profile,
-                company=request.POST.get('company'),
-                position=request.POST.get('position'),
-                location=request.POST.get('location', ''),
-                start_date=request.POST.get('start_date'),
-                end_date=request.POST.get('end_date') if not current else None,
-                current=current,
-                description=request.POST.get('description', '')
-            )
-            messages.success(request, 'Experience added successfully')
+        elif section == 'experience':
+            if action == 'add':
+                current = 'current' in request.POST
+                Experience.objects.create(
+                    user_profile=profile,
+                    company=request.POST.get('company'),
+                    position=request.POST.get('position'),
+                    location=request.POST.get('location', ''),
+                    start_date=request.POST.get('start_date'),
+                    end_date=request.POST.get('end_date') if not current else None,
+                    current=current,
+                    description=request.POST.get('description', '')
+                )
+                messages.success(request, 'Experience added successfully')
+            elif action == 'edit':
+                experience = get_object_or_404(Experience, id=request.POST.get('id'), user_profile=profile)
+                current = 'current' in request.POST
+                experience.company = request.POST.get('company')
+                experience.position = request.POST.get('position')
+                experience.location = request.POST.get('location', '')
+                experience.start_date = request.POST.get('start_date')
+                experience.end_date = request.POST.get('end_date') if not current else None
+                experience.current = current
+                experience.description = request.POST.get('description', '')
+                experience.save()
+                messages.success(request, 'Experience updated successfully')
             
         elif section == 'skill' and action == 'add':
             Skill.objects.create(
@@ -131,29 +155,51 @@ def edit_resume(request, slug):
             )
             messages.success(request, 'Skill added successfully')
             
-        elif section == 'project' and action == 'add':
-            Project.objects.create(
-                user_profile=profile,
-                title=request.POST.get('title'),
-                description=request.POST.get('description'),
-                technologies=request.POST.get('technologies', ''),
-                url=request.POST.get('url', ''),
-                start_date=request.POST.get('start_date') or None,
-                end_date=request.POST.get('end_date') or None
-            )
-            messages.success(request, 'Project added successfully')
+        elif section == 'project':
+            if action == 'add':
+                Project.objects.create(
+                    user_profile=profile,
+                    title=request.POST.get('title'),
+                    description=request.POST.get('description'),
+                    technologies=request.POST.get('technologies', ''),
+                    url=request.POST.get('url', ''),
+                    start_date=request.POST.get('start_date') or None,
+                    end_date=request.POST.get('end_date') or None
+                )
+                messages.success(request, 'Project added successfully')
+            elif action == 'edit':
+                project = get_object_or_404(Project, id=request.POST.get('id'), user_profile=profile)
+                project.title = request.POST.get('title')
+                project.description = request.POST.get('description')
+                project.technologies = request.POST.get('technologies', '')
+                project.url = request.POST.get('url', '')
+                project.start_date = request.POST.get('start_date') or None
+                project.end_date = request.POST.get('end_date') or None
+                project.save()
+                messages.success(request, 'Project updated successfully')
             
-        elif section == 'certification' and action == 'add':
-            Certification.objects.create(
-                user_profile=profile,
-                name=request.POST.get('name'),
-                issuer=request.POST.get('issuer'),
-                date_issued=request.POST.get('date_issued'),
-                expiration_date=request.POST.get('expiration_date') or None,
-                credential_id=request.POST.get('credential_id', ''),
-                credential_url=request.POST.get('credential_url', '')
-            )
-            messages.success(request, 'Certification added successfully')
+        elif section == 'certification':
+            if action == 'add':
+                Certification.objects.create(
+                    user_profile=profile,
+                    name=request.POST.get('name'),
+                    issuer=request.POST.get('issuer'),
+                    date_issued=request.POST.get('date_issued'),
+                    expiration_date=request.POST.get('expiration_date') or None,
+                    credential_id=request.POST.get('credential_id', ''),
+                    credential_url=request.POST.get('credential_url', '')
+                )
+                messages.success(request, 'Certification added successfully')
+            elif action == 'edit':
+                certification = get_object_or_404(Certification, id=request.POST.get('id'), user_profile=profile)
+                certification.name = request.POST.get('name')
+                certification.issuer = request.POST.get('issuer')
+                certification.date_issued = request.POST.get('date_issued')
+                certification.expiration_date = request.POST.get('expiration_date') or None
+                certification.credential_id = request.POST.get('credential_id', '')
+                certification.credential_url = request.POST.get('credential_url', '')
+                certification.save()
+                messages.success(request, 'Certification updated successfully')
             
         # Handle delete actions for all sections
         elif action == 'delete':
@@ -202,9 +248,187 @@ def edit_resume(request, slug):
         'projects': projects,
         'certifications': certifications,
         'templates': templates,
+        'now': timezone.now().date(),  # For checking certification expiration
     }
     
     return render(request, 'builder/edit_resume.html', context)
+
+@login_required
+def edit_resume_new(request, slug):
+    """Edit an existing resume with the new UI design"""
+    profile = get_object_or_404(UserProfile, user=request.user)
+    resume = get_object_or_404(Resume, slug=slug, user_profile=profile)
+    
+    if request.method == 'POST':
+        section = request.POST.get('section')
+        action = request.POST.get('action')
+        
+        if section == 'resume':
+            resume.title = request.POST.get('title')
+            resume.status = request.POST.get('status', resume.status)
+            
+            if 'template' in request.POST:
+                template_id = request.POST.get('template')
+                resume.template = get_object_or_404(ResumeTemplate, id=template_id)
+                
+            resume.save()
+            messages.success(request, 'Resume updated successfully')
+            
+        elif section == 'education':
+            if action == 'add':
+                Education.objects.create(
+                    user_profile=profile,
+                    institution=request.POST.get('institution'),
+                    degree=request.POST.get('degree'),
+                    field_of_study=request.POST.get('field_of_study', ''),
+                    start_date=request.POST.get('start_date'),
+                    end_date=request.POST.get('end_date') or None,
+                    description=request.POST.get('description', '')
+                )
+                messages.success(request, 'Education added successfully')
+            elif action == 'edit':
+                education = get_object_or_404(Education, id=request.POST.get('id'), user_profile=profile)
+                education.institution = request.POST.get('institution')
+                education.degree = request.POST.get('degree')
+                education.field_of_study = request.POST.get('field_of_study', '')
+                education.start_date = request.POST.get('start_date')
+                education.end_date = request.POST.get('end_date') or None
+                education.description = request.POST.get('description', '')
+                education.save()
+                messages.success(request, 'Education updated successfully')
+            
+        elif section == 'experience':
+            if action == 'add':
+                current = 'current' in request.POST
+                Experience.objects.create(
+                    user_profile=profile,
+                    company=request.POST.get('company'),
+                    position=request.POST.get('position'),
+                    location=request.POST.get('location', ''),
+                    start_date=request.POST.get('start_date'),
+                    end_date=request.POST.get('end_date') if not current else None,
+                    current=current,
+                    description=request.POST.get('description', '')
+                )
+                messages.success(request, 'Experience added successfully')
+            elif action == 'edit':
+                experience = get_object_or_404(Experience, id=request.POST.get('id'), user_profile=profile)
+                current = 'current' in request.POST
+                experience.company = request.POST.get('company')
+                experience.position = request.POST.get('position')
+                experience.location = request.POST.get('location', '')
+                experience.start_date = request.POST.get('start_date')
+                experience.end_date = request.POST.get('end_date') if not current else None
+                experience.current = current
+                experience.description = request.POST.get('description', '')
+                experience.save()
+                messages.success(request, 'Experience updated successfully')
+            
+        elif section == 'skill' and action == 'add':
+            Skill.objects.create(
+                user_profile=profile,
+                name=request.POST.get('name'),
+                level=request.POST.get('level', 'intermediate')
+            )
+            messages.success(request, 'Skill added successfully')
+            
+        elif section == 'project':
+            if action == 'add':
+                Project.objects.create(
+                    user_profile=profile,
+                    title=request.POST.get('title'),
+                    description=request.POST.get('description'),
+                    technologies=request.POST.get('technologies', ''),
+                    url=request.POST.get('url', ''),
+                    start_date=request.POST.get('start_date') or None,
+                    end_date=request.POST.get('end_date') or None
+                )
+                messages.success(request, 'Project added successfully')
+            elif action == 'edit':
+                project = get_object_or_404(Project, id=request.POST.get('id'), user_profile=profile)
+                project.title = request.POST.get('title')
+                project.description = request.POST.get('description')
+                project.technologies = request.POST.get('technologies', '')
+                project.url = request.POST.get('url', '')
+                project.start_date = request.POST.get('start_date') or None
+                project.end_date = request.POST.get('end_date') or None
+                project.save()
+                messages.success(request, 'Project updated successfully')
+            
+        elif section == 'certification':
+            if action == 'add':
+                Certification.objects.create(
+                    user_profile=profile,
+                    name=request.POST.get('name'),
+                    issuer=request.POST.get('issuer'),
+                    date_issued=request.POST.get('date_issued'),
+                    expiration_date=request.POST.get('expiration_date') or None,
+                    credential_id=request.POST.get('credential_id', ''),
+                    credential_url=request.POST.get('credential_url', '')
+                )
+                messages.success(request, 'Certification added successfully')
+            elif action == 'edit':
+                certification = get_object_or_404(Certification, id=request.POST.get('id'), user_profile=profile)
+                certification.name = request.POST.get('name')
+                certification.issuer = request.POST.get('issuer')
+                certification.date_issued = request.POST.get('date_issued')
+                certification.expiration_date = request.POST.get('expiration_date') or None
+                certification.credential_id = request.POST.get('credential_id', '')
+                certification.credential_url = request.POST.get('credential_url', '')
+                certification.save()
+                messages.success(request, 'Certification updated successfully')
+            
+        # Handle delete actions for all sections
+        elif action == 'delete':
+            item_id = request.POST.get('id')
+            
+            if section == 'education':
+                education = get_object_or_404(Education, id=item_id, user_profile=profile)
+                education.delete()
+                messages.success(request, 'Education deleted successfully')
+                
+            elif section == 'experience':
+                experience = get_object_or_404(Experience, id=item_id, user_profile=profile)
+                experience.delete()
+                messages.success(request, 'Experience deleted successfully')
+                
+            elif section == 'skill':
+                skill = get_object_or_404(Skill, id=item_id, user_profile=profile)
+                skill.delete()
+                messages.success(request, 'Skill deleted successfully')
+                
+            elif section == 'project':
+                project = get_object_or_404(Project, id=item_id, user_profile=profile)
+                project.delete()
+                messages.success(request, 'Project deleted successfully')
+                
+            elif section == 'certification':
+                certification = get_object_or_404(Certification, id=item_id, user_profile=profile)
+                certification.delete()
+                messages.success(request, 'Certification deleted successfully')
+        
+        return redirect('edit_resume_new', slug=resume.slug)
+    
+    educations = Education.objects.filter(user_profile=profile)
+    experiences = Experience.objects.filter(user_profile=profile)
+    skills = Skill.objects.filter(user_profile=profile)
+    projects = Project.objects.filter(user_profile=profile)
+    certifications = Certification.objects.filter(user_profile=profile)
+    templates = ResumeTemplate.objects.all()
+    
+    context = {
+        'resume': resume,
+        'profile': profile,
+        'educations': educations,
+        'experiences': experiences,
+        'skills': skills,
+        'projects': projects,
+        'certifications': certifications,
+        'templates': templates,
+        'now': timezone.now().date(),  # For checking certification expiration
+    }
+    
+    return render(request, 'builder/new_edit_resume.html', context)
 
 @login_required
 def view_resume(request, slug):

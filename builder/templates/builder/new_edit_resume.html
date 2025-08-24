@@ -1,0 +1,963 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/resume-editor.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="resume-editor">
+    <div class="editor-container">
+        <!-- Header -->
+        <div class="editor-header">
+            <h1 class="editor-title">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Edit Resume: {{ resume.title }}
+            </h1>
+            <div class="editor-actions">
+                <a href="{% url 'view_resume' resume.slug %}" class="btn btn-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    Preview
+                </a>
+                <button id="exportPdfButton" onclick="generateResumePdf('{{ resume.slug }}')" class="btn btn-primary">
+                    <svg id="pdfSpinner" class="animate-spin h-5 w-5 mr-2 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span class="btn-text">Export as PDF</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Basic Information Section -->
+        <div class="editor-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    Basic Information
+                </h2>
+            </div>
+            <div class="section-content">
+                <form method="post" action="{% url 'edit_resume' resume.slug %}" class="space-y-4">
+                    {% csrf_token %}
+                    <input type="hidden" name="section" value="resume">
+                    <input type="hidden" name="action" value="edit">
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="title" class="form-label">Resume Title</label>
+                            <input type="text" name="title" id="title" value="{{ resume.title }}" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="status" class="form-label">Status</label>
+                            <select name="status" id="status" class="form-control">
+                                <option value="draft" {% if resume.status == 'draft' %}selected{% endif %}>Draft</option>
+                                <option value="published" {% if resume.status == 'published' %}selected{% endif %}>Published</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span class="btn-text">Save Changes</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Education Section -->
+        <div class="editor-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                        <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+                    </svg>
+                    Education
+                </h2>
+                <button type="button" onclick="openModal('educationModal')" class="btn btn-primary btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add Education
+                </button>
+            </div>
+            <div class="section-content">
+                {% if educations %}
+                    <div class="timeline-connector">
+                        {% for education in educations %}
+                            <div class="item-card">
+                                <div class="item-header">
+                                    <div>
+                                        <h3 class="item-title">{{ education.degree }} {% if education.field_of_study %}in {{ education.field_of_study }}{% endif %}</h3>
+                                        <p class="item-subtitle">{{ education.institution }}</p>
+                                        <p class="item-meta">
+                                            {{ education.start_date|date:"M Y" }} - 
+                                            {% if not education.end_date %}Present{% else %}{{ education.end_date|date:"M Y" }}{% endif %}
+                                        </p>
+                                    </div>
+                                    <div class="item-actions">
+                                        <button type="button" onclick="editEducation('{{ education.id }}')" class="btn btn-icon btn-secondary">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                        </button>
+                                        <form method="post" action="{% url 'edit_resume' resume.slug %}" class="inline" onsubmit="return confirm('Are you sure you want to delete this education entry?');">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="section" value="education">
+                                            <input type="hidden" name="action" value="delete">
+                                            <input type="hidden" name="id" value="{{ education.id }}">
+                                            <button type="submit" class="btn btn-icon btn-danger">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                                {% if education.description %}
+                                    <div class="item-description">{{ education.description }}</div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="section-empty">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                            <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+                        </svg>
+                        <p>No education entries yet. Click 'Add Education' to get started.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Experience Section -->
+        <div class="editor-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    Work Experience
+                </h2>
+                <button type="button" onclick="openModal('experienceModal')" class="btn btn-primary btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add Experience
+                </button>
+            </div>
+            <div class="section-content">
+                {% if experiences %}
+                    <div class="timeline-connector">
+                        {% for experience in experiences %}
+                            <div class="item-card">
+                                <div class="item-header">
+                                    <div>
+                                        <h3 class="item-title">{{ experience.position }}</h3>
+                                        <p class="item-subtitle">{{ experience.company }}{% if experience.location %}, {{ experience.location }}{% endif %}</p>
+                                        <p class="item-meta">
+                                            {{ experience.start_date|date:"M Y" }} - 
+                                            {% if experience.current %}Present{% else %}{{ experience.end_date|date:"M Y" }}{% endif %}
+                                        </p>
+                                    </div>
+                                    <div class="item-actions">
+                                        <button type="button" onclick="editExperience('{{ experience.id }}')" class="btn btn-icon btn-secondary">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                        </button>
+                                        <form method="post" action="{% url 'edit_resume' resume.slug %}" class="inline" onsubmit="return confirm('Are you sure you want to delete this experience entry?');">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="section" value="experience">
+                                            <input type="hidden" name="action" value="delete">
+                                            <input type="hidden" name="id" value="{{ experience.id }}">
+                                            <button type="submit" class="btn btn-icon btn-danger">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                                {% if experience.description %}
+                                    <div class="item-description">{{ experience.description }}</div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="section-empty">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <p>No experience entries yet. Click 'Add Experience' to get started.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Skills Section -->
+        <div class="editor-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Skills
+                </h2>
+                <button type="button" onclick="openModal('skillModal')" class="btn btn-primary btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add Skill
+                </button>
+            </div>
+            <div class="section-content">
+                {% if skills %}
+                    <div class="flex flex-wrap">
+                        {% for skill in skills %}
+                            <div class="skill-tag">
+                                {{ skill.name }}
+                                {% if skill.level %}
+                                    <span class="skill-level">({{ skill.level }})</span>
+                                {% endif %}
+                                <form method="post" action="{% url 'edit_resume' resume.slug %}" class="inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="section" value="skill">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="id" value="{{ skill.id }}">
+                                    <button type="submit">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="section-empty">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        <p>No skills added yet. Click 'Add Skill' to get started.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Projects Section -->
+        <div class="editor-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    Projects
+                </h2>
+                <button type="button" onclick="openModal('projectModal')" class="btn btn-primary btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add Project
+                </button>
+            </div>
+            <div class="section-content">
+                {% if projects %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {% for project in projects %}
+                            <div class="item-card">
+                                <div class="item-header">
+                                    <div>
+                                        <h3 class="item-title">{{ project.title }}</h3>
+                                        {% if project.start_date %}
+                                            <p class="item-meta">
+                                                {{ project.start_date|date:"M Y" }}
+                                                {% if project.end_date %} - {{ project.end_date|date:"M Y" }}{% endif %}
+                                            </p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="item-actions">
+                                        <button type="button" onclick="editProject('{{ project.id }}')" class="btn btn-icon btn-secondary">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                        </button>
+                                        <form method="post" action="{% url 'edit_resume' resume.slug %}" class="inline" onsubmit="return confirm('Are you sure you want to delete this project?');">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="section" value="project">
+                                            <input type="hidden" name="action" value="delete">
+                                            <input type="hidden" name="id" value="{{ project.id }}">
+                                            <button type="submit" class="btn btn-icon btn-danger">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                                {% if project.description %}
+                                    <div class="item-description">{{ project.description|truncatechars:150 }}</div>
+                                {% endif %}
+                                {% if project.url %}
+                                    <div class="mt-2">
+                                        <a href="{{ project.url }}" target="_blank" class="btn btn-outline btn-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                            </svg>
+                                            View Project
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="section-empty">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        <p>No projects added yet. Click 'Add Project' to get started.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Certifications Section -->
+        <div class="editor-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    Certifications
+                </h2>
+                <button type="button" onclick="openModal('certificationModal')" class="btn btn-primary btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add Certification
+                </button>
+            </div>
+            <div class="section-content">
+                {% if certifications %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {% for certification in certifications %}
+                            <div class="item-card">
+                                <div class="item-header">
+                                    <div>
+                                        <h3 class="item-title">{{ certification.name }}</h3>
+                                        <p class="item-subtitle">{{ certification.issuer }}</p>
+                                        <p class="item-meta">
+                                            Issued: {{ certification.date_issued|date:"M Y" }}
+                                            {% if certification.expiration_date %}
+                                                <span class="badge {% if certification.expiration_date < now %}badge-warning{% else %}badge-success{% endif %} ml-2">
+                                                    {% if certification.expiration_date < now %}Expired{% else %}Valid{% endif %} until {{ certification.expiration_date|date:"M Y" }}
+                                                </span>
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                    <div class="item-actions">
+                                        <button type="button" onclick="editCertification('{{ certification.id }}')" class="btn btn-icon btn-secondary">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                        </button>
+                                        <form method="post" action="{% url 'edit_resume' resume.slug %}" class="inline" onsubmit="return confirm('Are you sure you want to delete this certification?');">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="section" value="certification">
+                                            <input type="hidden" name="action" value="delete">
+                                            <input type="hidden" name="id" value="{{ certification.id }}">
+                                            <button type="submit" class="btn btn-icon btn-danger">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                                {% if certification.credential_url %}
+                                    <div class="mt-2">
+                                        <a href="{{ certification.credential_url }}" target="_blank" class="btn btn-outline btn-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                            </svg>
+                                            View Credential
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="section-empty">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                        <p>No certifications added yet. Click 'Add Certification' to get started.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="flex justify-between mt-8">
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Templates -->
+<!-- Education Modal -->
+<div id="educationModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Add Education</h2>
+            <button type="button" class="modal-close" onclick="closeModal('educationModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form method="post" action="{% url 'edit_resume' resume.slug %}" id="educationForm">
+                {% csrf_token %}
+                <input type="hidden" name="section" value="education">
+                <input type="hidden" name="action" value="add">
+                <input type="hidden" name="id" id="education_id" value="">
+                
+                <div class="form-group">
+                    <label for="institution" class="form-label">Institution</label>
+                    <input type="text" name="institution" id="institution" required class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label for="degree" class="form-label">Degree</label>
+                    <input type="text" name="degree" id="degree" required class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label for="field_of_study" class="form-label">Field of Study</label>
+                    <input type="text" name="field_of_study" id="field_of_study" class="form-control">
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="start_date" class="form-label">Start Date</label>
+                        <input type="date" name="start_date" id="start_date" required class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="end_date" class="form-label">End Date</label>
+                        <input type="date" name="end_date" id="end_date" class="form-control">
+                        <span class="form-hint">Leave empty if this is your current education</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea name="description" id="description" rows="3" class="form-control"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" onclick="closeModal('educationModal')" class="btn btn-secondary">
+                Cancel
+            </button>
+            <button type="submit" form="educationForm" class="btn btn-primary">
+                <span class="btn-text" id="educationSubmitText">Add Education</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Experience Modal -->
+<div id="experienceModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Add Experience</h2>
+            <button type="button" class="modal-close" onclick="closeModal('experienceModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form method="post" action="{% url 'edit_resume' resume.slug %}" id="experienceForm">
+                {% csrf_token %}
+                <input type="hidden" name="section" value="experience">
+                <input type="hidden" name="action" value="add">
+                <input type="hidden" name="id" id="experience_id" value="">
+                
+                <div class="form-group">
+                    <label for="company" class="form-label">Company</label>
+                    <input type="text" name="company" id="company" required class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label for="position" class="form-label">Position</label>
+                    <input type="text" name="position" id="position" required class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label for="location" class="form-label">Location</label>
+                    <input type="text" name="location" id="location" class="form-control">
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="exp_start_date" class="form-label">Start Date</label>
+                        <input type="date" name="start_date" id="exp_start_date" required class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="exp_end_date" class="form-label">End Date</label>
+                        <input type="date" name="end_date" id="exp_end_date" class="form-control">
+                    </div>
+                </div>
+                
+                <div class="form-check">
+                    <input type="checkbox" name="current" id="current" class="form-check-input">
+                    <label for="current" class="form-check-label">I currently work here</label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="exp_description" class="form-label">Description</label>
+                    <textarea name="description" id="exp_description" rows="4" class="form-control"></textarea>
+                    <span class="form-hint">Use bullet points to highlight achievements and responsibilities</span>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" onclick="closeModal('experienceModal')" class="btn btn-secondary">
+                Cancel
+            </button>
+            <button type="submit" form="experienceForm" class="btn btn-primary">
+                <span class="btn-text" id="experienceSubmitText">Add Experience</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Skill Modal -->
+<div id="skillModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Add Skill</h2>
+            <button type="button" class="modal-close" onclick="closeModal('skillModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form method="post" action="{% url 'edit_resume' resume.slug %}" id="skillForm">
+                {% csrf_token %}
+                <input type="hidden" name="section" value="skill">
+                <input type="hidden" name="action" value="add">
+                
+                <div class="form-group">
+                    <label for="skill_name" class="form-label">Skill Name</label>
+                    <input type="text" name="name" id="skill_name" required class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label for="level" class="form-label">Proficiency Level</label>
+                    <select name="level" id="level" class="form-control">
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate" selected>Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                        <option value="expert">Expert</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" onclick="closeModal('skillModal')" class="btn btn-secondary">
+                Cancel
+            </button>
+            <button type="submit" form="skillForm" class="btn btn-primary">
+                <span class="btn-text">Add Skill</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Project Modal -->
+<div id="projectModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Add Project</h2>
+            <button type="button" class="modal-close" onclick="closeModal('projectModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form method="post" action="{% url 'edit_resume' resume.slug %}" id="projectForm">
+                {% csrf_token %}
+                <input type="hidden" name="section" value="project">
+                <input type="hidden" name="action" value="add">
+                <input type="hidden" name="id" id="project_id" value="">
+                
+                <div class="form-group">
+                    <label for="project_title" class="form-label">Project Title</label>
+                    <input type="text" name="title" id="project_title" required class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label for="project_description" class="form-label">Description</label>
+                    <textarea name="description" id="project_description" rows="3" required class="form-control"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="technologies" class="form-label">Technologies Used</label>
+                    <input type="text" name="technologies" id="technologies" class="form-control">
+                    <span class="form-hint">Separate technologies with commas (e.g., Python, React, SQL)</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="url" class="form-label">Project URL</label>
+                    <input type="url" name="url" id="url" class="form-control">
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="project_start_date" class="form-label">Start Date</label>
+                        <input type="date" name="start_date" id="project_start_date" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="project_end_date" class="form-label">End Date</label>
+                        <input type="date" name="end_date" id="project_end_date" class="form-control">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" onclick="closeModal('projectModal')" class="btn btn-secondary">
+                Cancel
+            </button>
+            <button type="submit" form="projectForm" class="btn btn-primary">
+                <span class="btn-text" id="projectSubmitText">Add Project</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Certification Modal -->
+<div id="certificationModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Add Certification</h2>
+            <button type="button" class="modal-close" onclick="closeModal('certificationModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form method="post" action="{% url 'edit_resume' resume.slug %}" id="certificationForm">
+                {% csrf_token %}
+                <input type="hidden" name="section" value="certification">
+                <input type="hidden" name="action" value="add">
+                <input type="hidden" name="id" id="certification_id" value="">
+                
+                <div class="form-group">
+                    <label for="cert_name" class="form-label">Certification Name</label>
+                    <input type="text" name="name" id="cert_name" required class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label for="issuer" class="form-label">Issuing Organization</label>
+                    <input type="text" name="issuer" id="issuer" required class="form-control">
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="date_issued" class="form-label">Date Issued</label>
+                        <input type="date" name="date_issued" id="date_issued" required class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="expiration_date" class="form-label">Expiration Date</label>
+                        <input type="date" name="expiration_date" id="expiration_date" class="form-control">
+                        <span class="form-hint">Leave empty if no expiration</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="credential_id" class="form-label">Credential ID</label>
+                    <input type="text" name="credential_id" id="credential_id" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label for="credential_url" class="form-label">Credential URL</label>
+                    <input type="url" name="credential_url" id="credential_url" class="form-control">
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" onclick="closeModal('certificationModal')" class="btn btn-secondary">
+                Cancel
+            </button>
+            <button type="submit" form="certificationForm" class="btn btn-primary">
+                <span class="btn-text" id="certificationSubmitText">Add Certification</span>
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/resume-editor.js' %}"></script>
+<script src="{% static 'js/resume_pdf.js' %}"></script>
+<script>
+    // Define edit functions
+    function editEducation(id) {
+        // Set the form action to edit
+        const form = document.getElementById('educationForm');
+        form.querySelector('input[name="action"]').value = 'edit';
+        form.querySelector('#education_id').value = id;
+        
+        // Change the button text
+        document.getElementById('educationSubmitText').textContent = 'Save Changes';
+        
+        // Get the education data and populate the form
+        fetch(`/api/resume/education/${id}/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('institution').value = data.institution || '';
+                document.getElementById('degree').value = data.degree || '';
+                document.getElementById('field_of_study').value = data.field_of_study || '';
+                document.getElementById('start_date').value = data.start_date || '';
+                document.getElementById('end_date').value = data.end_date || '';
+                document.getElementById('description').value = data.description || '';
+                
+                // Open the modal
+                openModal('educationModal');
+            })
+            .catch(error => {
+                console.error('Error fetching education data:', error);
+                showNotification('Error loading education data', 'error');
+            });
+    }
+    
+    function editExperience(id) {
+        // Set the form action to edit
+        const form = document.getElementById('experienceForm');
+        form.querySelector('input[name="action"]').value = 'edit';
+        form.querySelector('#experience_id').value = id;
+        
+        // Change the button text
+        document.getElementById('experienceSubmitText').textContent = 'Save Changes';
+        
+        // Get the experience data and populate the form
+        fetch(`/api/resume/experience/${id}/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('company').value = data.company || '';
+                document.getElementById('position').value = data.position || '';
+                document.getElementById('location').value = data.location || '';
+                document.getElementById('exp_start_date').value = data.start_date || '';
+                document.getElementById('exp_end_date').value = data.end_date || '';
+                document.getElementById('current').checked = data.current || false;
+                document.getElementById('exp_description').value = data.description || '';
+                
+                // Handle current checkbox
+                if (data.current) {
+                    document.getElementById('exp_end_date').disabled = true;
+                } else {
+                    document.getElementById('exp_end_date').disabled = false;
+                }
+                
+                // Open the modal
+                openModal('experienceModal');
+            })
+            .catch(error => {
+                console.error('Error fetching experience data:', error);
+                showNotification('Error loading experience data', 'error');
+            });
+    }
+    
+    function editProject(id) {
+        // Set the form action to edit
+        const form = document.getElementById('projectForm');
+        form.querySelector('input[name="action"]').value = 'edit';
+        form.querySelector('#project_id').value = id;
+        
+        // Change the button text
+        document.getElementById('projectSubmitText').textContent = 'Save Changes';
+        
+        // Get the project data and populate the form
+        fetch(`/api/resume/project/${id}/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('project_title').value = data.title || '';
+                document.getElementById('project_description').value = data.description || '';
+                document.getElementById('technologies').value = data.technologies || '';
+                document.getElementById('url').value = data.url || '';
+                document.getElementById('project_start_date').value = data.start_date || '';
+                document.getElementById('project_end_date').value = data.end_date || '';
+                
+                // Open the modal
+                openModal('projectModal');
+            })
+            .catch(error => {
+                console.error('Error fetching project data:', error);
+                showNotification('Error loading project data', 'error');
+            });
+    }
+    
+    function editCertification(id) {
+        // Set the form action to edit
+        const form = document.getElementById('certificationForm');
+        form.querySelector('input[name="action"]').value = 'edit';
+        form.querySelector('#certification_id').value = id;
+        
+        // Change the button text
+        document.getElementById('certificationSubmitText').textContent = 'Save Changes';
+        
+        // Get the certification data and populate the form
+        fetch(`/api/resume/certification/${id}/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('cert_name').value = data.name || '';
+                document.getElementById('issuer').value = data.issuer || '';
+                document.getElementById('date_issued').value = data.date_issued || '';
+                document.getElementById('expiration_date').value = data.expiration_date || '';
+                document.getElementById('credential_id').value = data.credential_id || '';
+                document.getElementById('credential_url').value = data.credential_url || '';
+                
+                // Open the modal
+                openModal('certificationModal');
+            })
+            .catch(error => {
+                console.error('Error fetching certification data:', error);
+                showNotification('Error loading certification data', 'error');
+            });
+    }
+    
+    // Initialize modals
+    function openModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+        
+        // Reset form if adding new item
+        const form = modal.querySelector('form');
+        if (form && form.querySelector('input[name="action"]').value === 'add') {
+            form.reset();
+            
+            // Reset any hidden ID fields
+            const idField = form.querySelector('input[type="hidden"][name="id"]');
+            if (idField) idField.value = '';
+            
+            // Reset submit button text
+            const submitText = modal.querySelector('.btn-text');
+            if (submitText) {
+                submitText.textContent = submitText.textContent.replace('Save Changes', 'Add');
+            }
+        }
+        
+        modal.style.display = 'block';
+        document.body.classList.add('modal-open');
+    }
+    
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+        
+        modal.style.display = 'none';
+        document.body.classList.remove('modal-open');
+    }
+    
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modals = document.getElementsByClassName('modal');
+        for (let i = 0; i < modals.length; i++) {
+            if (event.target === modals[i]) {
+                closeModal(modals[i].id);
+            }
+        }
+    }
+    
+    // Handle current job checkbox
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentCheckbox = document.getElementById('current');
+        const endDateInput = document.getElementById('exp_end_date');
+        
+        if (currentCheckbox && endDateInput) {
+            currentCheckbox.addEventListener('change', function() {
+                endDateInput.disabled = this.checked;
+                if (this.checked) {
+                    endDateInput.value = '';
+                }
+            });
+        }
+    });
+    
+    // Show notification
+    function showNotification(message, type = 'info') {
+        // Create notification container if it doesn't exist
+        let container = document.getElementById('notification-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'notification-container';
+            container.style.position = 'fixed';
+            container.style.top = '1rem';
+            container.style.right = '1rem';
+            container.style.zIndex = '1000';
+            container.style.display = 'flex';
+            container.style.flexDirection = 'column';
+            container.style.gap = '0.5rem';
+            document.body.appendChild(container);
+        }
+        
+        // Create notification
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.style.padding = '0.75rem 1.25rem';
+        notification.style.borderRadius = '0.375rem';
+        notification.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+        notification.style.display = 'flex';
+        notification.style.alignItems = 'center';
+        notification.style.animation = 'slideIn 0.3s ease';
+        
+        // Set color based on type
+        switch (type) {
+            case 'success':
+                notification.style.backgroundColor = '#10b981';
+                notification.style.color = 'white';
+                break;
+            case 'error':
+                notification.style.backgroundColor = '#ef4444';
+                notification.style.color = 'white';
+                break;
+            case 'warning':
+                notification.style.backgroundColor = '#f59e0b';
+                notification.style.color = 'white';
+                break;
+            default:
+                notification.style.backgroundColor = '#3b82f6';
+                notification.style.color = 'white';
+        }
+        
+        notification.textContent = message;
+        
+        // Add to container
+        container.appendChild(notification);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            notification.style.transition = 'opacity 0.3s ease';
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }, 3000);
+    }
+</script>
+{% endblock %}

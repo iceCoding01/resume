@@ -4,6 +4,7 @@
     <title>Resume Builder Pro</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -19,6 +20,7 @@
             }
         }
     </script>
+    {% block extra_css %}{% endblock %}
 </head>
 <body class="bg-gray-50 min-h-screen">
     <nav class="bg-white shadow-md">
@@ -63,5 +65,7 @@
             </p>
         </div>
     </footer>
+    
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

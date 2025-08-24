@@ -11,6 +11,7 @@ urlpatterns = [
     # Resume CRUD operations
     path('resume/create/', views.create_resume, name='create_resume'),
     path('resume/<slug:slug>/edit/', views.edit_resume, name='edit_resume'),
+    path('resume/<slug:slug>/edit-new/', views.edit_resume_new, name='edit_resume_new'),
     path('resume/<slug:slug>/view/', views.view_resume, name='view_resume'),
     path('resume/<slug:slug>/delete/', views.delete_resume, name='delete_resume'),
     
