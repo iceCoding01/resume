@@ -17,11 +17,11 @@ from datetime import datetime
 
 
 @login_required
-def preview_resume(request, resume_id):
+def preview_resume(request, slug):
     """
     Display a preview of the resume with template selection options
     """
-    resume = get_object_or_404(Resume, id=resume_id, user=request.user)
+    resume = get_object_or_404(Resume, slug=slug, user=request.user)
     available_templates = ResumeTemplate.objects.all()
     
     # Check if it's an AJAX request for the preview content only
@@ -53,11 +53,11 @@ def preview_resume(request, resume_id):
 
 
 @login_required
-def generate_resume_pdf(request, resume_id):
+def generate_resume_pdf(request, slug):
     """
     Generate a PDF of the resume and return the URL to download it
     """
-    resume = get_object_or_404(Resume, id=resume_id, user=request.user)
+    resume = get_object_or_404(Resume, slug=slug, user=request.user)
     
     # Get parameters
     template_id = request.GET.get('template_id')
@@ -111,11 +111,11 @@ def generate_resume_pdf(request, resume_id):
 
 @login_required
 @require_POST
-def duplicate_resume(request, resume_id):
+def duplicate_resume(request, slug):
     """
     Create a duplicate of an existing resume
     """
-    original_resume = get_object_or_404(Resume, id=resume_id, user=request.user)
+    original_resume = get_object_or_404(Resume, slug=slug, user=request.user)
     
     # Create a new resume with the same data
     new_resume = Resume.objects.create(
@@ -138,16 +138,16 @@ def duplicate_resume(request, resume_id):
     return JsonResponse({
         'success': True,
         'message': 'Resume duplicated successfully',
-        'new_resume_id': new_resume.id
+        'new_resume_id': new_resume.slug
     })
 
 
 @login_required
-def share_resume(request, resume_id):
+def share_resume(request, slug):
     """
     Share a resume with a public link
     """
-    resume = get_object_or_404(Resume, id=resume_id, user=request.user)
+    resume = get_object_or_404(Resume, slug=slug, user=request.user)
     
     if request.method == 'POST':
         # Toggle public status
@@ -168,7 +168,7 @@ def share_resume(request, resume_id):
             }
         )
         
-        return redirect('preview_resume', resume_id=resume.id)
+        return redirect('preview_resume', slug=resume.slug)
     
     return render(request, 'share_resume.html', {
         'resume': resume
@@ -198,11 +198,11 @@ def public_resume_view(request, share_token):
 
 
 @login_required
-def resume_analytics(request, resume_id):
+def resume_analytics(request, slug):
     """
     Display analytics for a resume
     """
-    resume = get_object_or_404(Resume, id=resume_id, user=request.user)
+    resume = get_object_or_404(Resume, slug=slug, user=request.user)
     
     # Get analytics data
     analytics = ResumeAnalytics.objects.filter(resume=resume).order_by('-created_at')
@@ -239,6 +239,44 @@ def resume_analytics(request, resume_id):
         'trend_labels': json.dumps(trend_labels),
         'trend_values': json.dumps(trend_values)
     })
+
+
+@csrf_exempt
+@require_POST
+def resume_view_api(request):
+    """
+    API endpoint to record resume views from public pages
+    """
+    try:
+        data = json.loads(request.body)
+        share_token = data.get('share_token')
+        referrer = data.get('referrer', '')
+        
+        if not share_token:
+            return JsonResponse({'error': 'Share token is required'}, status=400)
+        
+        try:
+            resume = Resume.objects.get(share_token=share_token, is_public=True)
+        except Resume.DoesNotExist:
+            return JsonResponse({'error': 'Resume not found'}, status=404)
+        
+        # Record analytics
+        ResumeAnalytics.objects.create(
+            resume=resume,
+            action='viewed',
+            metadata={
+                'ip': get_client_ip(request),
+                'user_agent': request.META.get('HTTP_USER_AGENT', ''),
+                'referrer': referrer
+            }
+        )
+        
+        return JsonResponse({'success': True})
+    
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 
 # Helper function to get client IP
