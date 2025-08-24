@@ -1,0 +1,38 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ resume.title }} | {{ resume.content.personal_info.full_name }}</title>
+    <meta name="author" content="{{ resume.content.personal_info.full_name }}">
+    <meta name="description" content="Resume for {{ resume.content.personal_info.full_name }}">
+    <meta name="generator" content="Resume Builder">
+</head>
+<body class="font-{{ font }} color-{{ color }}">
+    {% if template.name == "Modern" %}
+        {% include "resume_templates/modern.html" with resume=resume %}
+    {% elif template.name == "Professional" %}
+        {% include "resume_templates/professional.html" with resume=resume %}
+    {% elif template.name == "Creative" %}
+        {% include "resume_templates/creative.html" with resume=resume %}
+    {% elif template.name == "Minimal" %}
+        {% include "resume_templates/minimal.html" with resume=resume %}
+    {% else %}
+        {% include "resume_templates/classic.html" with resume=resume %}
+    {% endif %}
+    
+    {% if export_mode %}
+    <footer>
+        <p class="generated-info">Generated on {{ generation_date|date:"F j, Y" }} at {{ generation_date|time:"g:i A" }}</p>
+        
+        {% if resume.is_public and resume.share_token %}
+        <div class="qr-code">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://{{ request.get_host }}/r/{{ resume.share_token }}/" alt="QR Code" />
+        </div>
+        {% endif %}
+    </footer>
+    {% endif %}
+</body>
+</html>

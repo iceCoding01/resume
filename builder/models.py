@@ -1,11 +1,13 @@
 
 from django.db import models
+from django.contrib.auth.models import User
 from django.utils.text import slugify
 from django.utils import timezone
 import uuid
+import json
 
 class UserProfile(models.Model):
-    user = models.OneToOneField('auth.User', on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=100)
     email = models.EmailField()
     phone = models.CharField(max_length=20, blank=True)
@@ -103,6 +105,8 @@ class ResumeTemplate(models.Model):
     description = models.TextField()
     preview_image = models.URLField(blank=True)
     is_premium = models.BooleanField(default=False)
+    html_template = models.CharField(max_length=100, default='classic.html')
+    css_template = models.CharField(max_length=100, default='classic.css')
     
     def __str__(self):
         return self.name
@@ -113,14 +117,19 @@ class Resume(models.Model):
         ('published', 'Published'),
     )
     
-    user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='resumes')
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='resumes')
+    user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='user_resumes', null=True, blank=True)
     title = models.CharField(max_length=100)
     slug = models.SlugField(unique=True, blank=True)
     template = models.ForeignKey(ResumeTemplate, on_delete=models.SET_NULL, null=True, related_name='resumes')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
+    content = models.JSONField(default=dict, blank=True)
     custom_styles = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_public = models.BooleanField(default=False)
+    share_token = models.CharField(max_length=100, blank=True, null=True, unique=True)
     
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -133,19 +142,28 @@ class Resume(models.Model):
         return self.title
 
 class ResumeAnalytics(models.Model):
-    resume = models.OneToOneField(Resume, on_delete=models.CASCADE, related_name='analytics')
-    views = models.PositiveIntegerField(default=0)
-    downloads = models.PositiveIntegerField(default=0)
-    last_viewed = models.DateTimeField(null=True, blank=True)
+    ACTION_CHOICES = (
+        ('viewed', 'Viewed'),
+        ('pdf_generated', 'PDF Generated'),
+        ('duplicated', 'Duplicated'),
+        ('share_status_changed', 'Share Status Changed'),
+    )
     
-    def log_view(self):
-        self.views += 1
-        self.last_viewed = timezone.now()
-        self.save()
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    resume = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name='analytics_entries')
+    action = models.CharField(max_length=50, choices=ACTION_CHOICES)
+    metadata = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     
-    def log_download(self):
-        self.downloads += 1
-        self.save()
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = 'Resume Analytics'
+    
+    def set_metadata(self, data):
+        self.metadata = json.dumps(data)
+    
+    def get_metadata(self):
+        return json.loads(self.metadata)
     
     def __str__(self):
-        return f"Analytics for {self.resume.title}"
+        return f"{self.get_action_display()} - {self.resume.title} - {self.created_at.strftime('%Y-%m-%d %H:%M')}"
