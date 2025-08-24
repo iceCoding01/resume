@@ -1,211 +1,799 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+  /* Hero section animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes floatImage {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+    100% { transform: translateY(0px); }
+  }
+  
+  .hero-title {
+    animation: fadeInUp 0.8s ease-out forwards;
+  }
+  
+  .hero-subtitle {
+    animation: fadeInUp 0.8s ease-out 0.2s forwards;
+    opacity: 0;
+  }
+  
+  .hero-text {
+    animation: fadeInUp 0.8s ease-out 0.4s forwards;
+    opacity: 0;
+  }
+  
+  .hero-cta {
+    animation: fadeInUp 0.8s ease-out 0.6s forwards;
+    opacity: 0;
+  }
+  
+  .hero-image {
+    animation: floatImage 6s ease-in-out infinite;
+  }
+  
+  .gradient-text {
+    background: linear-gradient(90deg, #0ea5e9 0%, #38bdf8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .bg-gradient {
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  }
+  
+  .feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+  
+  .template-card:hover img {
+    transform: scale(1.05);
+  }
+  
+  .testimonial-card {
+    transition: all 0.3s ease;
+  }
+  
+  .testimonial-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="relative bg-primary overflow-hidden">
-  <div class="max-w-7xl mx-auto">
-    <div class="relative z-10 pb-8 bg-primary sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
-      <div class="pt-10 sm:pt-16 lg:pt-8 lg:pb-14 lg:overflow-hidden">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div class="lg:grid lg:grid-cols-12 lg:gap-8">
-            <div class="sm:text-center md:mx-auto lg:col-span-6 lg:text-left">
-              <h1 class="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl">
-                <span class="block">Your Career Journey,</span>
-                <span class="block text-blue-200">Professionally Presented</span>
-              </h1>
-              <p class="mt-3 text-base text-blue-100 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                Create professional resumes that stand out. Our platform offers modern templates, AI-powered content suggestions, and real-time analytics.
-              </p>
-              <div class="mt-8 sm:flex sm:justify-center lg:justify-start">
-                <div class="rounded-md shadow">
-                  <a href="{% url 'dashboard' %}" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary bg-white hover:bg-gray-100 md:py-4 md:text-lg md:px-10">
-                    Get Started
-                  </a>
-                </div>
-                <div class="mt-3 sm:mt-0 sm:ml-3">
-                  <a href="#features" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-700 hover:bg-blue-800 md:py-4 md:text-lg md:px-10">
-                    Learn More
-                  </a>
-                </div>
-              </div>
-            </div>
+<!-- Hero Section with Curved Design -->
+<div class="relative bg-gradient overflow-hidden">
+  <div class="absolute inset-0 z-0 opacity-20">
+    <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <defs>
+        <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+          <path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" stroke-width="0.5" opacity="0.3"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#grid)" />
+    </svg>
+  </div>
+  
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="flex flex-col lg:flex-row items-center py-12 md:py-20 lg:py-24">
+      <!-- Left content -->
+      <div class="w-full lg:w-1/2 text-center lg:text-left">
+        <h1 class="hero-title text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-tight">
+          <span class="block">Your Career Journey,</span>
+          <span class="block mt-2">Professionally <span class="text-blue-200">Presented</span></span>
+        </h1>
+        
+        <p class="hero-text mt-6 text-lg md:text-xl text-blue-100 max-w-2xl mx-auto lg:mx-0">
+          Create standout resumes that get you noticed. Our premium platform offers ATS-optimized templates, AI-powered content suggestions, and real-time performance analytics.
+        </p>
+        
+        <div class="hero-cta mt-8 flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
+          <a href="{% url 'dashboard' %}" class="px-8 py-4 bg-white text-primary font-semibold rounded-lg shadow-lg hover:shadow-xl transform transition hover:-translate-y-1 text-center">
+            Get Started Free
+          </a>
+          <a href="#features" class="px-8 py-4 bg-blue-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:bg-blue-800 transform transition hover:-translate-y-1 text-center">
+            Explore Features
+          </a>
+        </div>
+        
+        <div class="hero-subtitle mt-8 flex items-center justify-center lg:justify-start space-x-6">
+          <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-200" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+            <span class="ml-2 text-blue-100">ATS Optimized</span>
+          </div>
+          <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-200" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+            <span class="ml-2 text-blue-100">AI Powered</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right content - Hero image -->
+      <div class="w-full lg:w-1/2 mt-10 lg:mt-0 flex justify-center">
+        <div class="hero-image relative w-full max-w-md">
+          <img src="https://images.unsplash.com/photo-1586281380117-5a60ae2050cc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cmVzdW1lfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60" alt="Professional Resume" class="rounded-lg shadow-2xl" />
+          
+          <!-- Floating elements -->
+          <div class="absolute -top-4 -right-4 bg-white p-3 rounded-lg shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          
+          <div class="absolute -bottom-4 -left-4 bg-white p-3 rounded-lg shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
           </div>
         </div>
       </div>
     </div>
   </div>
+  
+  <!-- Curved bottom -->
+  <div class="absolute bottom-0 left-0 right-0">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 80">
+      <path fill="#ffffff" fill-opacity="1" d="M0,64L80,58.7C160,53,320,43,480,42.7C640,43,800,53,960,53.3C1120,53,1280,43,1360,37.3L1440,32L1440,80L1360,80C1280,80,1120,80,960,80C800,80,640,80,480,80C320,80,160,80,80,80L0,80Z"></path>
+    </svg>
+  </div>
 </div>
 
-<div id="features" class="py-12 bg-white">
+<!-- Features Section -->
+<div id="features" class="py-20 bg-white">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="lg:text-center">
-      <h2 class="text-base text-primary font-semibold tracking-wide uppercase">Features</h2>
-      <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-        Everything you need to succeed
-      </p>
-      <p class="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-        Our resume builder is designed for professionals who want to showcase their experience effectively.
+    <div class="text-center mb-16">
+      <p class="inline-block px-3 py-1 text-sm font-semibold text-primary bg-blue-50 rounded-full uppercase tracking-wide">Features</p>
+      <h2 class="mt-4 text-3xl md:text-4xl font-bold text-gray-900">Everything you need to succeed</h2>
+      <p class="mt-4 text-xl text-gray-500 max-w-3xl mx-auto">
+        Our resume builder is designed for professionals who want to showcase their experience effectively and land their dream job.
       </p>
     </div>
 
-    <div class="mt-10">
-      <div class="space-y-10 md:space-y-0 md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-10">
-        <div class="relative">
-          <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary text-white">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-            </svg>
-          </div>
-          <div class="ml-16">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Professional Templates</h3>
-            <p class="mt-2 text-base text-gray-500">
-              Choose from a variety of professionally designed templates that catch recruiters' attention.
-            </p>
-          </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Feature 1 -->
+      <div class="feature-card bg-white p-8 rounded-xl border border-gray-100 shadow-sm transition duration-300 ease-in-out">
+        <div class="w-14 h-14 rounded-lg bg-blue-50 flex items-center justify-center mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+          </svg>
         </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-3">Professional Templates</h3>
+        <p class="text-gray-600 mb-4">
+          Choose from a variety of professionally designed templates that are optimized for ATS systems and catch recruiters' attention.
+        </p>
+        <ul class="space-y-2">
+          <li class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span class="text-gray-600">ATS-optimized designs</span>
+          </li>
+          <li class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span class="text-gray-600">Industry-specific layouts</span>
+          </li>
+        </ul>
+      </div>
 
-        <div class="relative">
-          <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary text-white">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
-            </svg>
-          </div>
-          <div class="ml-16">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">AI Content Optimization</h3>
-            <p class="mt-2 text-base text-gray-500">
-              Get smart suggestions to improve your resume content and make it ATS-friendly.
-            </p>
-          </div>
+      <!-- Feature 2 -->
+      <div class="feature-card bg-white p-8 rounded-xl border border-gray-100 shadow-sm transition duration-300 ease-in-out">
+        <div class="w-14 h-14 rounded-lg bg-blue-50 flex items-center justify-center mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
         </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-3">AI Content Optimization</h3>
+        <p class="text-gray-600 mb-4">
+          Get smart suggestions to improve your resume content and make it stand out to both automated systems and human recruiters.
+        </p>
+        <ul class="space-y-2">
+          <li class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span class="text-gray-600">Keyword optimization</span>
+          </li>
+          <li class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span class="text-gray-600">Achievement suggestions</span>
+          </li>
+        </ul>
+      </div>
 
-        <div class="relative">
-          <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-primary text-white">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" />
-            </svg>
-          </div>
-          <div class="ml-16">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Resume Analytics</h3>
-            <p class="mt-2 text-base text-gray-500">
-              Track how your resume performs with real-time view statistics and insights.
-            </p>
-          </div>
+      <!-- Feature 3 -->
+      <div class="feature-card bg-white p-8 rounded-xl border border-gray-100 shadow-sm transition duration-300 ease-in-out">
+        <div class="w-14 h-14 rounded-lg bg-blue-50 flex items-center justify-center mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
         </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-3">Resume Analytics</h3>
+        <p class="text-gray-600 mb-4">
+          Track how your resume performs with real-time view statistics and insights to optimize your job application strategy.
+        </p>
+        <ul class="space-y-2">
+          <li class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span class="text-gray-600">View tracking</span>
+          </li>
+          <li class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span class="text-gray-600">Performance insights</span>
+          </li>
+        </ul>
+      </div>
+      
+      <!-- Feature 4 -->
+      <div class="feature-card bg-white p-8 rounded-xl border border-gray-100 shadow-sm transition duration-300 ease-in-out">
+        <div class="w-14 h-14 rounded-lg bg-blue-50 flex items-center justify-center mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-3">One-Click Export</h3>
+        <p class="text-gray-600 mb-4">
+          Export your resume in multiple formats with a single click, ready to share with employers or upload to job sites.
+        </p>
+        <ul class="space-y-2">
+          <li class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span class="text-gray-600">PDF, DOCX, and HTML formats</span>
+          </li>
+          <li class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span class="text-gray-600">Easy sharing options</span>
+          </li>
+        </ul>
+      </div>
+      
+      <!-- Feature 5 -->
+      <div class="feature-card bg-white p-8 rounded-xl border border-gray-100 shadow-sm transition duration-300 ease-in-out">
+        <div class="w-14 h-14 rounded-lg bg-blue-50 flex items-center justify-center mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-3">Privacy & Security</h3>
+        <p class="text-gray-600 mb-4">
+          Your career information is sensitive. We use enterprise-grade security to keep your data private and secure.
+        </p>
+        <ul class="space-y-2">
+          <li class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span class="text-gray-600">SSL encryption</span>
+          </li>
+          <li class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span class="text-gray-600">GDPR compliant</span>
+          </li>
+        </ul>
+      </div>
+      
+      <!-- Feature 6 -->
+      <div class="feature-card bg-white p-8 rounded-xl border border-gray-100 shadow-sm transition duration-300 ease-in-out">
+        <div class="w-14 h-14 rounded-lg bg-blue-50 flex items-center justify-center mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-3">24/7 Support</h3>
+        <p class="text-gray-600 mb-4">
+          Get help whenever you need it with our comprehensive knowledge base and responsive support team.
+        </p>
+        <ul class="space-y-2">
+          <li class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span class="text-gray-600">Quick response time</span>
+          </li>
+          <li class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span class="text-gray-600">Expert career advice</span>
+          </li>
+        </ul>
       </div>
     </div>
   </div>
 </div>
 
-<div class="bg-gray-50 py-12">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="lg:text-center">
-      <h2 class="text-base text-primary font-semibold tracking-wide uppercase">Templates</h2>
-      <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-        Choose your professional style
+<!-- Templates Section with Curved Top -->
+<div class="relative bg-gray-50 py-24">
+  <!-- Curved top -->
+  <div class="absolute top-0 left-0 right-0 transform rotate-180">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 80">
+      <path fill="#ffffff" fill-opacity="1" d="M0,64L80,58.7C160,53,320,43,480,42.7C640,43,800,53,960,53.3C1120,53,1280,43,1360,37.3L1440,32L1440,80L1360,80C1280,80,1120,80,960,80C800,80,640,80,480,80C320,80,160,80,80,80L0,80Z"></path>
+    </svg>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+    <div class="text-center mb-16">
+      <p class="inline-block px-3 py-1 text-sm font-semibold text-primary bg-blue-50 rounded-full uppercase tracking-wide">Templates</p>
+      <h2 class="mt-4 text-3xl md:text-4xl font-bold text-gray-900">Professional resume templates for every career</h2>
+      <p class="mt-4 text-xl text-gray-500 max-w-3xl mx-auto">
+        Select a template that fits your industry and career stage to make the best impression.
       </p>
     </div>
     
-    <div class="mt-10 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-          <div class="px-4 py-5 sm:p-6">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Classic</h3>
-            <div class="mt-3 bg-gray-100 h-40 rounded flex items-center justify-center">
-              <p class="text-gray-500">Preview</p>
-            </div>
-            <div class="mt-4">
-              <a href="{% url 'dashboard' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-blue-600">
-                Get Started
-              </a>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      <!-- Template 1 -->
+      <div class="template-card bg-white rounded-xl overflow-hidden shadow-md transition duration-300 hover:shadow-xl">
+        <div class="relative overflow-hidden h-64">
+          <img src="https://images.unsplash.com/photo-1586281380117-5a60ae2050cc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cmVzdW1lfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60" alt="Classic Template" class="w-full h-full object-cover transition duration-300" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
+            <div class="p-4 text-white">
+              <h3 class="text-lg font-semibold">Classic</h3>
+              <p class="text-sm opacity-80">Timeless and professional</p>
             </div>
           </div>
         </div>
-        
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-          <div class="px-4 py-5 sm:p-6">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Modern</h3>
-            <div class="mt-3 bg-gray-100 h-40 rounded flex items-center justify-center">
-              <p class="text-gray-500">Preview</p>
+        <div class="p-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <div class="h-2 w-2 rounded-full bg-green-500 mr-2"></div>
+              <span class="text-sm text-gray-600">ATS Optimized</span>
             </div>
-            <div class="mt-4">
-              <a href="{% url 'dashboard' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-blue-600">
-                Get Started
-              </a>
+            <span class="text-sm text-primary font-medium">Popular</span>
+          </div>
+          <div class="mt-4">
+            <a href="{% url 'dashboard' %}" class="block w-full py-2 px-4 bg-primary text-white text-center rounded-lg hover:bg-blue-600 transition">
+              Use This Template
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Template 2 -->
+      <div class="template-card bg-white rounded-xl overflow-hidden shadow-md transition duration-300 hover:shadow-xl">
+        <div class="relative overflow-hidden h-64">
+          <img src="https://images.unsplash.com/photo-1634128221889-82ed6efebfc3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cmVzdW1lJTIwdGVtcGxhdGV8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60" alt="Modern Template" class="w-full h-full object-cover transition duration-300" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
+            <div class="p-4 text-white">
+              <h3 class="text-lg font-semibold">Modern</h3>
+              <p class="text-sm opacity-80">Contemporary and clean</p>
             </div>
           </div>
         </div>
-        
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-          <div class="px-4 py-5 sm:p-6">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Creative</h3>
-            <div class="mt-3 bg-gray-100 h-40 rounded flex items-center justify-center">
-              <p class="text-gray-500">Preview</p>
+        <div class="p-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <div class="h-2 w-2 rounded-full bg-green-500 mr-2"></div>
+              <span class="text-sm text-gray-600">ATS Optimized</span>
             </div>
-            <div class="mt-4">
-              <a href="{% url 'dashboard' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-blue-600">
-                Get Started
-              </a>
+            <span class="text-sm text-primary font-medium">Trending</span>
+          </div>
+          <div class="mt-4">
+            <a href="{% url 'dashboard' %}" class="block w-full py-2 px-4 bg-primary text-white text-center rounded-lg hover:bg-blue-600 transition">
+              Use This Template
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Template 3 -->
+      <div class="template-card bg-white rounded-xl overflow-hidden shadow-md transition duration-300 hover:shadow-xl">
+        <div class="relative overflow-hidden h-64">
+          <img src="https://images.unsplash.com/photo-1586282391129-76a6df230234?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cmVzdW1lfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60" alt="Creative Template" class="w-full h-full object-cover transition duration-300" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
+            <div class="p-4 text-white">
+              <h3 class="text-lg font-semibold">Creative</h3>
+              <p class="text-sm opacity-80">Stand out from the crowd</p>
             </div>
           </div>
         </div>
-        
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-          <div class="px-4 py-5 sm:p-6">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Executive</h3>
-            <div class="mt-3 bg-gray-100 h-40 rounded flex items-center justify-center">
-              <p class="text-gray-500">Preview</p>
+        <div class="p-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <div class="h-2 w-2 rounded-full bg-green-500 mr-2"></div>
+              <span class="text-sm text-gray-600">ATS Optimized</span>
             </div>
-            <div class="mt-4">
-              <a href="{% url 'dashboard' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-blue-600">
-                Get Started
-              </a>
+            <span class="text-sm text-primary font-medium">Creative</span>
+          </div>
+          <div class="mt-4">
+            <a href="{% url 'dashboard' %}" class="block w-full py-2 px-4 bg-primary text-white text-center rounded-lg hover:bg-blue-600 transition">
+              Use This Template
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Template 4 -->
+      <div class="template-card bg-white rounded-xl overflow-hidden shadow-md transition duration-300 hover:shadow-xl">
+        <div class="relative overflow-hidden h-64">
+          <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cHJvZmlsZXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60" alt="Executive Template" class="w-full h-full object-cover transition duration-300" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
+            <div class="p-4 text-white">
+              <h3 class="text-lg font-semibold">Executive</h3>
+              <p class="text-sm opacity-80">Senior-level and professional</p>
             </div>
           </div>
         </div>
+        <div class="p-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <div class="h-2 w-2 rounded-full bg-green-500 mr-2"></div>
+              <span class="text-sm text-gray-600">ATS Optimized</span>
+            </div>
+            <span class="text-sm text-primary font-medium">Premium</span>
+          </div>
+          <div class="mt-4">
+            <a href="{% url 'dashboard' %}" class="block w-full py-2 px-4 bg-primary text-white text-center rounded-lg hover:bg-blue-600 transition">
+              Use This Template
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mt-12 text-center">
+      <a href="{% url 'dashboard' %}" class="inline-flex items-center px-6 py-3 text-base font-medium rounded-lg text-primary bg-blue-50 hover:bg-blue-100 transition">
+        View all templates
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+      </a>
     </div>
   </div>
 </div>
 
-<div class="bg-white py-12">
+<!-- Testimonials Section -->
+<div class="bg-white py-24">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="lg:text-center">
-      <h2 class="text-base text-primary font-semibold tracking-wide uppercase">Testimonials</h2>
-      <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-        What our users say
+    <div class="text-center mb-16">
+      <p class="inline-block px-3 py-1 text-sm font-semibold text-primary bg-blue-50 rounded-full uppercase tracking-wide">Testimonials</p>
+      <h2 class="mt-4 text-3xl md:text-4xl font-bold text-gray-900">Success stories from our users</h2>
+      <p class="mt-4 text-xl text-gray-500 max-w-3xl mx-auto">
+        See how our platform has helped professionals across industries land their dream jobs.
       </p>
     </div>
     
-    <div class="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-      <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
-        <div class="flex items-center mb-4">
-          <div class="h-12 w-12 rounded-full bg-gray-200"></div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- Testimonial 1 -->
+      <div class="testimonial-card bg-white p-8 rounded-xl border border-gray-100 shadow-sm transition duration-300 ease-in-out">
+        <div class="flex items-center mb-6">
+          <div class="flex-shrink-0">
+            <img class="h-14 w-14 rounded-full object-cover" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cHJvZmlsZXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60" alt="Jane Smith" />
+          </div>
           <div class="ml-4">
-            <h4 class="text-lg font-medium text-gray-900">Jane Smith</h4>
-            <p class="text-sm text-gray-500">Software Engineer</p>
+            <h4 class="text-lg font-semibold text-gray-900">Jane Smith</h4>
+            <p class="text-sm text-gray-600">Software Engineer at Google</p>
           </div>
         </div>
-        <p class="text-gray-600">"This resume builder helped me land interviews at three top tech companies. The templates are modern and the analytics feature showed me exactly how my resume was performing."</p>
+        
+        <div class="mb-6">
+          <div class="flex text-yellow-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+          </div>
+        </div>
+        
+        <p class="text-gray-600 mb-6">
+          "This resume builder helped me land interviews at three top tech companies, including Google. The modern templates and AI suggestions made my resume stand out from hundreds of other applicants."
+        </p>
+        
+        <div class="pt-6 border-t border-gray-100">
+          <p class="text-sm text-gray-500 italic">
+            "I received 5 interview requests within the first week of sending out my new resume."
+          </p>
+        </div>
       </div>
       
-      <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
-        <div class="flex items-center mb-4">
-          <div class="h-12 w-12 rounded-full bg-gray-200"></div>
+      <!-- Testimonial 2 -->
+      <div class="testimonial-card bg-white p-8 rounded-xl border border-gray-100 shadow-sm transition duration-300 ease-in-out">
+        <div class="flex items-center mb-6">
+          <div class="flex-shrink-0">
+            <img class="h-14 w-14 rounded-full object-cover" src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8cHJvZmlsZXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=500&q=60" alt="Michael Johnson" />
+          </div>
           <div class="ml-4">
-            <h4 class="text-lg font-medium text-gray-900">Michael Johnson</h4>
-            <p class="text-sm text-gray-500">Marketing Director</p>
+            <h4 class="text-lg font-semibold text-gray-900">Michael Johnson</h4>
+            <p class="text-sm text-gray-600">Marketing Director at Spotify</p>
           </div>
         </div>
-        <p class="text-gray-600">"After 15 years in marketing, I needed a resume that truly showcased my experience. This platform helped me organize my career achievements in a way that really stands out."</p>
+        
+        <div class="mb-6">
+          <div class="flex text-yellow-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+          </div>
+        </div>
+        
+        <p class="text-gray-600 mb-6">
+          "After 15 years in marketing, I needed a resume that truly showcased my experience. This platform helped me organize my career achievements in a way that really stands out. The analytics feature showed me exactly how my resume was performing."
+        </p>
+        
+        <div class="pt-6 border-t border-gray-100">
+          <p class="text-sm text-gray-500 italic">
+            "The resume analytics gave me insights I never would have considered."
+          </p>
+        </div>
       </div>
       
-      <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
-        <div class="flex items-center mb-4">
-          <div class="h-12 w-12 rounded-full bg-gray-200"></div>
+      <!-- Testimonial 3 -->
+      <div class="testimonial-card bg-white p-8 rounded-xl border border-gray-100 shadow-sm transition duration-300 ease-in-out">
+        <div class="flex items-center mb-6">
+          <div class="flex-shrink-0">
+            <img class="h-14 w-14 rounded-full object-cover" src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fHByb2ZpbGV8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60" alt="Sarah Williams" />
+          </div>
           <div class="ml-4">
-            <h4 class="text-lg font-medium text-gray-900">Sarah Williams</h4>
-            <p class="text-sm text-gray-500">Healthcare Professional</p>
+            <h4 class="text-lg font-semibold text-gray-900">Sarah Williams</h4>
+            <p class="text-sm text-gray-600">Healthcare Administrator</p>
           </div>
         </div>
-        <p class="text-gray-600">"The industry-specific templates were perfect for my healthcare background. I could easily highlight my certifications and specialized experience in a professional format."</p>
+        
+        <div class="mb-6">
+          <div class="flex text-yellow-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+          </div>
+        </div>
+        
+        <p class="text-gray-600 mb-6">
+          "The industry-specific templates were perfect for my healthcare background. I could easily highlight my certifications and specialized experience in a professional format. I received compliments from every interviewer about my resume."
+        </p>
+        
+        <div class="pt-6 border-t border-gray-100">
+          <p class="text-sm text-gray-500 italic">
+            "I secured my dream position within 3 weeks of using my new resume."
+          </p>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+<!-- Stats Section -->
+<div class="bg-gray-50 py-20">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12">
+      <p class="inline-block px-3 py-1 text-sm font-semibold text-primary bg-blue-50 rounded-full uppercase tracking-wide">Why Choose Us</p>
+      <h2 class="mt-4 text-3xl md:text-4xl font-bold text-gray-900">Numbers speak for themselves</h2>
+    </div>
+    
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+      <div class="text-center">
+        <p class="text-4xl md:text-5xl font-bold text-primary">98%</p>
+        <p class="mt-2 text-lg font-medium text-gray-600">Interview Rate</p>
+        <p class="mt-1 text-sm text-gray-500">For optimized resumes</p>
+      </div>
+      
+      <div class="text-center">
+        <p class="text-4xl md:text-5xl font-bold text-primary">250k+</p>
+        <p class="mt-2 text-lg font-medium text-gray-600">Happy Users</p>
+        <p class="mt-1 text-sm text-gray-500">And counting</p>
+      </div>
+      
+      <div class="text-center">
+        <p class="text-4xl md:text-5xl font-bold text-primary">30+</p>
+        <p class="mt-2 text-lg font-medium text-gray-600">Resume Templates</p>
+        <p class="mt-1 text-sm text-gray-500">Professionally designed</p>
+      </div>
+      
+      <div class="text-center">
+        <p class="text-4xl md:text-5xl font-bold text-primary">4.9/5</p>
+        <p class="mt-2 text-lg font-medium text-gray-600">User Rating</p>
+        <p class="mt-1 text-sm text-gray-500">Based on 10,000+ reviews</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA Section -->
+<div class="relative bg-gradient py-20 overflow-hidden">
+  <div class="absolute inset-0 z-0 opacity-20">
+    <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <defs>
+        <pattern id="grid-cta" width="10" height="10" patternUnits="userSpaceOnUse">
+          <path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" stroke-width="0.5" opacity="0.3"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#grid-cta)" />
+    </svg>
+  </div>
+  
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+    <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Ready to build your professional resume?</h2>
+    <p class="text-xl text-blue-100 mb-10 max-w-3xl mx-auto">
+      Join thousands of professionals who have already boosted their careers with our premium resume builder.
+    </p>
+    
+    <div class="flex flex-col sm:flex-row justify-center gap-4">
+      <a href="{% url 'dashboard' %}" class="px-8 py-4 bg-white text-primary font-semibold rounded-lg shadow-lg hover:shadow-xl transform transition hover:-translate-y-1 text-center">
+        Create Your Resume Now
+      </a>
+      {% if not user.is_authenticated %}
+      <a href="/accounts/signup/" class="px-8 py-4 bg-blue-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:bg-blue-800 transform transition hover:-translate-y-1 text-center">
+        Sign Up Free
+      </a>
+      {% endif %}
+    </div>
+    
+    <p class="mt-6 text-blue-200">No credit card required. Get started in minutes.</p>
+  </div>
+</div>
+
+<!-- FAQ Section -->
+<div class="bg-white py-20">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <p class="inline-block px-3 py-1 text-sm font-semibold text-primary bg-blue-50 rounded-full uppercase tracking-wide">FAQ</p>
+      <h2 class="mt-4 text-3xl md:text-4xl font-bold text-gray-900">Frequently Asked Questions</h2>
+    </div>
+    
+    <div class="space-y-6">
+      <div class="bg-white rounded-xl overflow-hidden border border-gray-200">
+        <details class="group">
+          <summary class="flex items-center justify-between p-6 cursor-pointer">
+            <h3 class="text-lg font-semibold text-gray-900">How do I get started with ResumeBuilder Pro?</h3>
+            <span class="ml-6 flex-shrink-0 text-primary group-open:rotate-180 transition-transform">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </span>
+          </summary>
+          <div class="px-6 pb-6 text-gray-600">
+            <p>Getting started is easy! Simply create a free account, choose a template that fits your career goals, and start adding your information. Our step-by-step process will guide you through creating a professional resume in minutes.</p>
+          </div>
+        </details>
+      </div>
+      
+      <div class="bg-white rounded-xl overflow-hidden border border-gray-200">
+        <details class="group">
+          <summary class="flex items-center justify-between p-6 cursor-pointer">
+            <h3 class="text-lg font-semibold text-gray-900">Is my resume ATS-friendly?</h3>
+            <span class="ml-6 flex-shrink-0 text-primary group-open:rotate-180 transition-transform">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </span>
+          </summary>
+          <div class="px-6 pb-6 text-gray-600">
+            <p>Yes! All our templates are designed to be ATS-friendly. Our system also provides suggestions for keywords and content that will help your resume pass through applicant tracking systems used by most employers today.</p>
+          </div>
+        </details>
+      </div>
+      
+      <div class="bg-white rounded-xl overflow-hidden border border-gray-200">
+        <details class="group">
+          <summary class="flex items-center justify-between p-6 cursor-pointer">
+            <h3 class="text-lg font-semibold text-gray-900">Can I export my resume in different formats?</h3>
+            <span class="ml-6 flex-shrink-0 text-primary group-open:rotate-180 transition-transform">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </span>
+          </summary>
+          <div class="px-6 pb-6 text-gray-600">
+            <p>Absolutely! You can export your resume in PDF, DOCX, and HTML formats. This gives you flexibility when applying to different positions that might require specific file types.</p>
+          </div>
+        </details>
+      </div>
+      
+      <div class="bg-white rounded-xl overflow-hidden border border-gray-200">
+        <details class="group">
+          <summary class="flex items-center justify-between p-6 cursor-pointer">
+            <h3 class="text-lg font-semibold text-gray-900">How can I track my resume's performance?</h3>
+            <span class="ml-6 flex-shrink-0 text-primary group-open:rotate-180 transition-transform">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </span>
+          </summary>
+          <div class="px-6 pb-6 text-gray-600">
+            <p>Our platform provides detailed analytics for each resume you create. You can see how many times your resume has been viewed, downloaded, and more. This helps you understand which versions of your resume are performing best.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Smooth scrolling for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      
+      document.querySelector(this.getAttribute('href')).scrollIntoView({
+        behavior: 'smooth'
+      });
+    });
+  });
+  
+  // Reveal animations on scroll
+  const revealElements = document.querySelectorAll('.feature-card, .template-card, .testimonial-card');
+  
+  const revealOnScroll = () => {
+    for (let i = 0; i < revealElements.length; i++) {
+      const elementTop = revealElements[i].getBoundingClientRect().top;
+      const windowHeight = window.innerHeight;
+      
+      if (elementTop < windowHeight - 100) {
+        revealElements[i].classList.add('animate-fade-in');
+      }
+    }
+  };
+  
+  window.addEventListener('scroll', revealOnScroll);
+  revealOnScroll(); // Check on initial load
+</script>
 {% endblock %}

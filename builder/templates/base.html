@@ -12,44 +12,359 @@
                 extend: {
                     colors: {
                         primary: '#0ea5e9',
-                        secondary: '#64748b',
+                                    // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            if (mobileMenuButton && mobileMenu) {
+                console.log('Mobile menu components found');
+                mobileMenuButton.addEventListener('click', function() {
+                    console.log('Mobile menu button clicked');
+                    const expanded = this.getAttribute('aria-expanded') === 'true';
+                    this.setAttribute('aria-expanded', !expanded);
+                    
+                    if (expanded) {
+                        mobileMenu.classList.add('hidden');
+                    } else {
+                        mobileMenu.classList.remove('hidden');
+                    }
+                });
+            } else {
+                console.error('Mobile menu button or menu not found:', { 
+                    button: mobileMenuButton, 
+                    menu: mobileMenu 
+                });
+            }48b',
                         dark: '#0f172a',
                         light: '#f8fafc'
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        }
                     }
                 }
             }
         }
     </script>
+    <style>
+        /* For webkit browsers like Chrome, Safari */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #0ea5e9;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0284c7;
+        }
+        
+        /* Animation for dropdown */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        #user-dropdown:not(.hidden) {
+            animation: fadeIn 0.2s ease-out forwards;
+        }
+        
+        #templates-dropdown:not(.hidden) {
+            animation: fadeIn 0.2s ease-out forwards;
+        }
+        
+        /* Profile pic hover effect */
+        #user-menu-button .rounded-full {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        #user-menu-button:hover .rounded-full {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.3);
+        }
+        
+        /* Templates menu hover effect */
+        #templates-menu-button {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        #templates-menu-button::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: #0ea5e9;
+            transition: width 0.2s ease;
+        }
+        
+        #templates-menu-button:hover::after {
+            width: 100%;
+        }
+    </style>
     {% block extra_css %}{% endblock %}
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <nav class="bg-white shadow-md">
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <div class="sticky top-0 z-50">
+        {% comment %} <div class="bg-primary text-white text-center text-sm py-2">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                🚀 New feature: AI-powered resume feedback now available! <a href="{% url 'dashboard' %}" class="underline font-medium hover:text-blue-200">Try it now →</a>
+            </div>
+        </div> {% endcomment %}
+    <nav class="bg-white shadow-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
+            <div class="flex justify-between h-20">
                 <div class="flex">
                     <div class="flex-shrink-0 flex items-center">
-                        <a href="/" class="text-2xl font-bold text-primary">ResumeBuilder Pro</a>
+                        <a href="/" class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span class="text-2xl font-bold text-gray-800">Resume<span class="text-primary">Builder</span></span>
+                        </a>
+                    </div>
+                    <div class="hidden md:ml-12 md:flex md:items-center md:space-x-6">
+                        <a href="/" class="text-base font-medium text-gray-600 hover:text-primary transition duration-150">Home</a>
+                        <a href="#features" class="text-base font-medium text-gray-600 hover:text-primary transition duration-150">Features</a>
+                        
+                        <!-- Templates dropdown -->
+                        <div class="relative" x-data="{ open: false }">
+                            <button type="button" class="flex items-center text-base font-medium text-gray-600 hover:text-primary transition duration-150 px-3 py-2 rounded hover:bg-gray-100" id="templates-menu-button" aria-expanded="false" aria-haspopup="true" onclick="toggleTemplatesDropdown()">
+                                <span>Templates</span>
+                                <svg class="ml-1 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                            
+                            <!-- Template dropdown menu -->
+                            <div class="hidden absolute left-0 mt-2 w-80 rounded-lg shadow-xl py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50 grid grid-cols-2 gap-1 p-3" role="menu" aria-orientation="vertical" aria-labelledby="templates-menu-button" tabindex="-1" id="templates-dropdown" style="box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);">
+                                <!-- Modern template -->
+                                <a href="{% url 'dashboard' %}?template=modern" class="group rounded-md p-2 flex items-start hover:bg-blue-50" role="menuitem">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded bg-primary text-white flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm font-medium text-gray-900 group-hover:text-primary">Modern</p>
+                                        <p class="text-xs text-gray-500">Clean, professional look</p>
+                                    </div>
+                                </a>
+                                
+                                <!-- Minimal template -->
+                                <a href="{% url 'dashboard' %}?template=minimal" class="group rounded-md p-2 flex items-start hover:bg-blue-50" role="menuitem">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded bg-gray-600 text-white flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                        </svg>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm font-medium text-gray-900 group-hover:text-primary">Minimal</p>
+                                        <p class="text-xs text-gray-500">Simple and elegant</p>
+                                    </div>
+                                </a>
+                                
+                                <!-- Creative template -->
+                                <a href="{% url 'dashboard' %}?template=creative" class="group rounded-md p-2 flex items-start hover:bg-blue-50" role="menuitem">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded bg-purple-600 text-white flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm font-medium text-gray-900 group-hover:text-primary">Creative</p>
+                                        <p class="text-xs text-gray-500">Stand out with style</p>
+                                    </div>
+                                </a>
+                                
+                                <!-- Executive template -->
+                                <a href="{% url 'dashboard' %}?template=executive" class="group rounded-md p-2 flex items-start hover:bg-blue-50" role="menuitem">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded bg-blue-800 text-white flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm font-medium text-gray-900 group-hover:text-primary">Executive</p>
+                                        <p class="text-xs text-gray-500">For senior positions</p>
+                                    </div>
+                                </a>
+                                
+                                <!-- See all templates link -->
+                                <div class="col-span-2 mt-3 pt-3 border-t border-gray-100 text-center">
+                                    <a href="{% url 'dashboard' %}" class="text-sm font-medium text-primary hover:text-blue-700">
+                                        View all templates →
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <a href="#" class="text-base font-medium text-gray-600 hover:text-primary transition duration-150">Pricing</a>
                     </div>
                 </div>
-                <div class="flex items-center">
+                <div class="flex items-center space-x-4">
                     {% if user.is_authenticated %}
-                        <a href="{% url 'dashboard' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary">Dashboard</a>
-                        <a href="/accounts/logout/" class="ml-4 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary">Logout</a>
+                        <a href="{% url 'dashboard' %}" class="hidden md:inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-primary bg-blue-50 hover:bg-blue-100 transition duration-150">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                            Dashboard
+                        </a>
+                        
+                        <!-- Profile dropdown -->
+                        <div class="relative">
+                            <button type="button" class="flex items-center focus:outline-none transition duration-150 hover:opacity-90" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                                <span class="sr-only">Open user menu</span>
+                                <div class="h-10 w-10 rounded-full bg-primary text-white flex items-center justify-center overflow-hidden border-2 border-white shadow-md hover:border-primary transition duration-150">
+                                    {% if user.profile_image %}
+                                        <img src="{{ user.profile_image.url }}" alt="{{ user.username }}" class="h-full w-full object-cover">
+                                    {% else %}
+                                        <span class="text-lg font-bold">{{ user.username|slice:":1"|upper }}</span>
+                                    {% endif %}
+                                </div>
+                            </button>
+                            
+                            <!-- Dropdown menu, show/hide based on menu state -->
+                            <div class="hidden absolute right-0 mt-2 w-56 rounded-lg shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50 transform origin-top-right transition-all duration-150" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1" id="user-dropdown">
+                                <div class="px-4 py-3 border-b">
+                                    <p class="text-sm font-medium text-gray-900">{{ user.get_full_name|default:user.username }}</p>
+                                    <p class="text-xs text-gray-500 truncate">{{ user.email }}</p>
+                                </div>
+                                <a href="{% url 'dashboard' %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                    </svg>
+                                    Dashboard
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    Your Resumes
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    Account Settings
+                                </a>
+                                <div class="border-t border-gray-100 my-1"></div>
+                                <a href="/accounts/logout/" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50" role="menuitem">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                    </svg>
+                                    Sign out
+                                </a>
+                            </div>
+                        </div>
                     {% else %}
-                        <a href="/accounts/login/" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-primary">Login</a>
-                        <a href="/accounts/signup/" class="ml-4 px-4 py-2 rounded-md text-sm font-medium text-white bg-primary hover:bg-blue-500">Sign up</a>
+                        <a href="/accounts/login/" class="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-primary bg-white hover:bg-blue-50 transition duration-150">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                            </svg>
+                            Login
+                        </a>
+                        <a href="/accounts/signup/" class="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-blue-600 shadow-sm hover:shadow transition duration-150">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                            </svg>
+                            Sign up
+                        </a>
                     {% endif %}
+                    
+                    <!-- Mobile menu button -->
+                    <button type="button" id="mobile-menu-button" class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary" aria-expanded="false">
+                        <span class="sr-only">Open main menu</span>
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
                 </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu, show/hide based on menu state -->
+        <div class="hidden md:hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="/" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">Home</a>
+                <a href="#features" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">Features</a>
+                
+                <!-- Mobile Templates Section -->
+                <div class="py-2">
+                    <p class="px-3 text-base font-medium text-gray-700">Templates</p>
+                    <div class="mt-1 space-y-1">
+                        <a href="{% url 'dashboard' %}?template=modern" class="block pl-6 pr-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-primary hover:bg-gray-50">
+                            Modern
+                        </a>
+                        <a href="{% url 'dashboard' %}?template=minimal" class="block pl-6 pr-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-primary hover:bg-gray-50">
+                            Minimal
+                        </a>
+                        <a href="{% url 'dashboard' %}?template=creative" class="block pl-6 pr-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-primary hover:bg-gray-50">
+                            Creative
+                        </a>
+                        <a href="{% url 'dashboard' %}?template=executive" class="block pl-6 pr-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-primary hover:bg-gray-50">
+                            Executive
+                        </a>
+                        <a href="{% url 'dashboard' %}" class="block pl-6 pr-3 py-2 rounded-md text-sm font-medium text-primary hover:text-blue-700">
+                            View all templates →
+                        </a>
+                    </div>
+                </div>
+                
+                <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">Pricing</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">Dashboard</a>
+                    <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">Your Resumes</a>
+                    <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">Account Settings</a>
+                    <div class="border-t border-gray-200 my-1"></div>
+                    <a href="/accounts/logout/" class="block px-3 py-2 rounded-md text-base font-medium text-red-600 hover:text-red-800 hover:bg-red-50">Sign out</a>
+                {% endif %}
             </div>
         </div>
     </nav>
     
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <main class="max-w-7xl mx-auto pb-6 sm:px-6 lg:px-8">
         {% if messages %}
-            <div class="messages mb-8">
+            <div class="messages mb-8 px-4 sm:px-0 pt-6">
                 {% for message in messages %}
-                    <div class="bg-{{ message.tags|default:'blue' }}-100 border-l-4 border-{{ message.tags|default:'blue' }}-500 text-{{ message.tags|default:'blue' }}-700 p-4 mb-4" role="alert">
-                        <p>{{ message }}</p>
+                    <div class="bg-{{ message.tags|default:'blue' }}-100 border-l-4 border-{{ message.tags|default:'blue' }}-500 text-{{ message.tags|default:'blue' }}-700 p-4 mb-4 rounded-md shadow-sm" role="alert">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                {% if message.tags == 'success' %}
+                                    <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                    </svg>
+                                {% elif message.tags == 'error' or message.tags == 'danger' %}
+                                    <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                    </svg>
+                                {% elif message.tags == 'warning' %}
+                                    <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                {% else %}
+                                    <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                    </svg>
+                                {% endif %}
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm">{{ message }}</p>
+                            </div>
+                        </div>
                     </div>
                 {% endfor %}
             </div>
@@ -58,14 +373,268 @@
         {% block content %}{% endblock %}
     </main>
     
-    <footer class="bg-white border-t mt-12 py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <p class="text-center text-gray-500 text-sm">
-                &copy; {% now "Y" %} ResumeBuilder Pro. All rights reserved.
-            </p>
+    <footer class="bg-gray-900 text-white">
+        <div class="max-w-7xl mx-auto pt-12 pb-8 px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Logo and description -->
+                <div class="col-span-1 md:col-span-1">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span class="text-xl font-bold text-white">Resume<span class="text-primary">Builder</span></span>
+                    </div>
+                    <p class="mt-4 text-gray-400 text-sm">
+                        Create professional resumes in minutes with our easy-to-use platform. Get noticed by employers and land your dream job.
+                    </p>
+                    <div class="mt-6 flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-primary">
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-primary">
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-primary">
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-primary">
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider">Resources</h3>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-primary">Templates</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary">Resume Examples</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary">Career Blog</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary">Resume Tips</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Company -->
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider">Company</h3>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-primary">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary">Pricing</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary">Terms of Service</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary">Contact Us</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Newsletter -->
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider">Subscribe to our newsletter</h3>
+                    <p class="mt-4 text-gray-400 text-sm">Get the latest tips and updates to maximize your career opportunities.</p>
+                    <div class="mt-4">
+                        <form class="flex">
+                            <input type="email" name="email" id="email" required placeholder="Enter your email" class="min-w-0 flex-1 bg-gray-800 border border-gray-700 text-gray-300 px-4 py-2 rounded-l-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                            <button type="submit" class="px-4 py-2 bg-primary text-white font-medium rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                Subscribe
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Copyright -->
+            <div class="mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between">
+                <p class="text-gray-400 text-sm">
+                    &copy; {% now "Y" %} ResumeBuilder Pro. All rights reserved.
+                </p>
+                <p class="mt-4 md:mt-0 text-gray-400 text-sm">
+                    Designed with ❤️ for professionals worldwide
+                </p>
+            </div>
         </div>
     </footer>
     
     {% block extra_js %}{% endblock %}
+    
+    <script>
+        // Mobile menu toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            // Log initialization to help debug
+            console.log('DOM fully loaded, initializing menus and dropdowns');
+            
+            const mobileMenuButton = document.querySelector('button[aria-expanded]');
+            const mobileMenu = document.querySelector('.hidden.md\\:hidden');
+            
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', function() {
+                    const expanded = this.getAttribute('aria-expanded') === 'true';
+                    this.setAttribute('aria-expanded', !expanded);
+                    
+                    if (expanded) {
+                        mobileMenu.classList.add('hidden');
+                    } else {
+                        mobileMenu.classList.remove('hidden');
+                    }
+                });
+            }
+            
+            // Profile dropdown toggle
+            const userMenuButton = document.getElementById('user-menu-button');
+            const userDropdown = document.getElementById('user-dropdown');
+            
+            if (userMenuButton && userDropdown) {
+                userMenuButton.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Prevent event bubbling
+                    const expanded = this.getAttribute('aria-expanded') === 'true';
+                    this.setAttribute('aria-expanded', !expanded);
+                    
+                    if (expanded) {
+                        userDropdown.classList.add('hidden');
+                        userDropdown.classList.remove('transform', 'scale-100', 'opacity-100');
+                        userDropdown.classList.add('scale-95', 'opacity-0');
+                    } else {
+                        userDropdown.classList.remove('hidden');
+                        // Force a reflow before adding the transitions
+                        void userDropdown.offsetWidth;
+                        userDropdown.classList.add('transform', 'scale-100', 'opacity-100');
+                        userDropdown.classList.remove('scale-95', 'opacity-0');
+                    }
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (userMenuButton && userDropdown && !userMenuButton.contains(event.target) && !userDropdown.contains(event.target)) {
+                        userDropdown.classList.add('hidden');
+                        userMenuButton.setAttribute('aria-expanded', 'false');
+                    }
+                });
+                
+                // Add keyboard support for accessibility
+                userMenuButton.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.click();
+                    }
+                });
+            }
+            
+            // Templates dropdown toggle
+            const templatesMenuButton = document.getElementById('templates-menu-button');
+            const templatesDropdown = document.getElementById('templates-dropdown');
+            
+            console.log('Templates menu button:', templatesMenuButton);
+            console.log('Templates dropdown:', templatesDropdown);
+            
+            if (templatesMenuButton && templatesDropdown) {
+                console.log('Adding click event listener to templates menu button');
+                
+                templatesMenuButton.addEventListener('click', function(e) {
+                    console.log('Templates button clicked');
+                    e.stopPropagation(); // Prevent event bubbling
+                    e.preventDefault(); // Prevent any default action
+                    
+                    const expanded = this.getAttribute('aria-expanded') === 'true';
+                    console.log('Current expanded state:', expanded);
+                    
+                    this.setAttribute('aria-expanded', !expanded);
+                    
+                    if (expanded) {
+                        console.log('Hiding templates dropdown');
+                        templatesDropdown.classList.add('hidden');
+                    } else {
+                        console.log('Showing templates dropdown');
+                        // Close other dropdowns first
+                        if (userDropdown && !userDropdown.classList.contains('hidden')) {
+                            userDropdown.classList.add('hidden');
+                            userMenuButton.setAttribute('aria-expanded', 'false');
+                        }
+                        
+                        templatesDropdown.classList.remove('hidden');
+                    }
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (templatesMenuButton && templatesDropdown && 
+                        !templatesMenuButton.contains(event.target) && 
+                        !templatesDropdown.contains(event.target)) {
+                        templatesDropdown.classList.add('hidden');
+                        templatesMenuButton.setAttribute('aria-expanded', 'false');
+                    }
+                });
+                
+                // Add keyboard support for accessibility
+                templatesMenuButton.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.click();
+                    }
+                });
+            } else {
+                console.error('Could not find templates menu button or dropdown');
+            }
+            
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (mobileMenu && !mobileMenu.classList.contains('hidden') && 
+                    !mobileMenu.contains(event.target) && 
+                    !mobileMenuButton.contains(event.target)) {
+                    mobileMenu.classList.add('hidden');
+                    mobileMenuButton.setAttribute('aria-expanded', 'false');
+                }
+            });
+            
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    if (href !== '#' && href.startsWith('#')) {
+                        e.preventDefault();
+                        
+                        const targetElement = document.querySelector(href);
+                        if (targetElement) {
+                            targetElement.scrollIntoView({
+                                behavior: 'smooth'
+                            });
+                            
+                            // Close mobile menu if open
+                            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                                mobileMenu.classList.add('hidden');
+                                mobileMenuButton.setAttribute('aria-expanded', 'false');
+                            }
+                        }
+                    }
+                });
+            });
+        });
+        
+        // Simple direct function to toggle templates dropdown
+        function toggleTemplatesDropdown() {
+            const dropdown = document.getElementById('templates-dropdown');
+            if (dropdown.classList.contains('hidden')) {
+                dropdown.classList.remove('hidden');
+                
+                // Add a one-time event listener to close when clicking outside
+                setTimeout(() => {
+                    document.addEventListener('click', function closeDropdown(event) {
+                        const button = document.getElementById('templates-menu-button');
+                        if (!dropdown.contains(event.target) && !button.contains(event.target)) {
+                            dropdown.classList.add('hidden');
+                            document.removeEventListener('click', closeDropdown);
+                        }
+                    });
+                }, 0);
+            } else {
+                dropdown.classList.add('hidden');
+            }
+        }
+    </script>
 </body>
 </html>
