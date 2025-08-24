@@ -118,7 +118,7 @@ class Resume(models.Model):
     )
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='resumes')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='resumes', null=True)
     user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='user_resumes', null=True, blank=True)
     title = models.CharField(max_length=100)
     slug = models.SlugField(unique=True, blank=True)
@@ -151,9 +151,9 @@ class ResumeAnalytics(models.Model):
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     resume = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name='analytics_entries')
-    action = models.CharField(max_length=50, choices=ACTION_CHOICES)
+    action = models.CharField(max_length=50, choices=ACTION_CHOICES, default='viewed')
     metadata = models.JSONField(default=dict, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now)
     
     class Meta:
         ordering = ['-created_at']

@@ -1,9 +1,10 @@
-from weasyprint import HTML, CSS
+"""
+PDF utility functions for resume generation
+"""
 from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.conf import settings
 from django.utils import timezone
-from weasyprint.fonts import FontConfiguration
 import os
 import uuid
 import logging
@@ -29,6 +30,10 @@ def generate_pdf(resume, template=None, font='helvetica', color='blue'):
         Exception: If PDF generation fails
     """
     try:
+        # Import here to avoid circular import
+        from weasyprint import HTML, CSS
+        from weasyprint.fonts import FontConfiguration
+        
         # Use the resume's template if none provided
         if template is None:
             template = resume.template
@@ -117,6 +122,12 @@ def generate_pdf_response(resume, template=None, font='helvetica', color='blue',
         HttpResponse with PDF content
     """
     try:
+        # Check if WeasyPrint is available
+        from .weasyprint_utils import is_weasyprint_available, get_weasyprint_error_response
+        
+        if not is_weasyprint_available():
+            return get_weasyprint_error_response()
+        
         # Generate the PDF file
         pdf_path, filename = generate_pdf(resume, template, font, color)
         
@@ -149,22 +160,9 @@ def generate_pdf_response(resume, template=None, font='helvetica', color='blue',
         error_message = handle_pdf_error(e)
         logger.error(f"PDF response generation error: {error_message}")
         
-        # Return an error response
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="error-resume.pdf"'
-        
-        error_html = f"""
-        <html>
-            <body>
-                <h1>Error Generating Resume</h1>
-                <p>We encountered an error while generating your resume. Please try again later or contact support.</p>
-                <p>Error reference: {uuid.uuid4().hex[:8]}</p>
-            </body>
-        </html>
-        """
-        
-        HTML(string=error_html).write_pdf(response)
-        return response
+        # Import WeasyPrint error handler
+        from .weasyprint_utils import get_weasyprint_error_response
+        return get_weasyprint_error_response()
 
 
 def handle_pdf_error(error):
@@ -193,6 +191,9 @@ def handle_pdf_error(error):
     
     elif "Memory" in error_str:
         return "The system ran out of memory while generating your PDF. Please try simplifying your resume or try again later."
+    
+    elif "libgobject" in error_str or "GTK" in error_str:
+        return "PDF generation requires GTK libraries. Please install GTK to enable PDF export."
     
     else:
         # Log the original error for debugging

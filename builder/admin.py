@@ -54,6 +54,6 @@ class ResumeAdmin(admin.ModelAdmin):
 
 @admin.register(ResumeAnalytics)
 class ResumeAnalyticsAdmin(admin.ModelAdmin):
-    list_display = ('resume', 'views', 'downloads', 'last_viewed')
-    list_filter = ('last_viewed',)
-    search_fields = ('resume__title',)
+    list_display = ('resume', 'action', 'created_at')
+    list_filter = ('action', 'created_at')
+    search_fields = ('resume__title', 'action')

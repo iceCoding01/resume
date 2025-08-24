@@ -8,13 +8,16 @@ from django.utils import timezone
 from django.conf import settings
 
 from .models import Resume, ResumeTemplate, ResumeAnalytics
-from .pdf_utils import generate_pdf, handle_pdf_error
 
 import json
 import os
 import uuid
 from datetime import datetime
 
+# Import PDF utilities with lazy imports to avoid circular dependencies
+def get_pdf_utils():
+    from .pdf_utils import generate_pdf, handle_pdf_error
+    return generate_pdf, handle_pdf_error
 
 @login_required
 def preview_resume(request, slug):
@@ -56,6 +59,7 @@ def preview_resume(request, slug):
 def generate_resume_pdf(request, slug):
     """
     Generate a PDF of the resume and return the URL to download it
+    Uses the WeasyPrint fallback mechanism
     """
     resume = get_object_or_404(Resume, slug=slug, user=request.user)
     
@@ -69,8 +73,22 @@ def generate_resume_pdf(request, slug):
     else:
         template = resume.template
     
+    # Import the dependency checking functions
+    from .weasyprint_utils import is_weasyprint_available
+    
+    # Check if WeasyPrint is available with dependencies
+    if not is_weasyprint_available():
+        # Return JSON error if WeasyPrint is not available
+        return JsonResponse({
+            'success': False,
+            'error': 'PDF generation requires GTK libraries. Please install GTK from the link provided in the error page.',
+            'html_fallback': True,
+            'fallback_url': f"/resume/{resume.slug}/export-pdf/"
+        })
+    
     try:
-        # Generate PDF
+        # WeasyPrint is available, proceed with PDF generation
+        generate_pdf, handle_pdf_error = get_pdf_utils()
         pdf_path, filename = generate_pdf(
             resume=resume,
             template=template,
@@ -102,10 +120,13 @@ def generate_resume_pdf(request, slug):
         
     except Exception as e:
         # Handle errors
+        generate_pdf, handle_pdf_error = get_pdf_utils()
         error_message = handle_pdf_error(e)
         return JsonResponse({
             'success': False,
-            'error': error_message
+            'error': error_message,
+            'html_fallback': True,
+            'fallback_url': f"/resume/{resume.slug}/export-pdf/"
         }, status=500)
 
 

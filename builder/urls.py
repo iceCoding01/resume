@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views, views_resume
+from .pdf_export import export_pdf_resume
 
 urlpatterns = [
     # Main views
@@ -17,7 +18,7 @@ urlpatterns = [
     path('resume/<slug:slug>/preview/', views_resume.preview_resume, name='preview_resume'),
     path('resume/<slug:slug>/generate-pdf/', views_resume.generate_resume_pdf, name='generate_resume_pdf'),
     path('resume/<slug:slug>/duplicate/', views_resume.duplicate_resume, name='duplicate_resume'),
-    path('resume/<slug:slug>/export-pdf/', views.export_pdf, name='export_pdf_resume'),
+    path('resume/<slug:slug>/export-pdf/', export_pdf_resume, name='export_pdf_resume'),
     path('export-pdf/', views.export_pdf, name='export_pdf'),
     
     # Sharing and analytics

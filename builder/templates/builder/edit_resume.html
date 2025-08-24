@@ -1,4 +1,44 @@
 {% extends 'base.html' %}
+{% load static %}
+{% block extra_css %}
+<style>
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 50;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+    }
+    
+    .modal-content {
+        background-color: #fefefe;
+        margin: 10% auto;
+        padding: 20px;
+        border-radius: 0.5rem;
+        width: 80%;
+        max-width: 600px;
+    }
+    
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+    
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="bg-white shadow rounded-lg p-6 mb-8">
     <div class="flex items-center justify-between mb-6">
@@ -16,8 +56,11 @@
     
     <div class="mb-8">
         <h2 class="text-lg font-medium text-gray-900 mb-4">Basic Information</h2>
-        <form method="post" action="#" class="space-y-4">
+        <form method="post" action="{% url 'edit_resume' resume.slug %}" class="space-y-4">
             {% csrf_token %}
+            <input type="hidden" name="section" value="resume">
+            <input type="hidden" name="action" value="edit">
+            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Resume Title</label>
@@ -25,10 +68,10 @@
                 </div>
                 
                 <div>
-                    <label for="is_public" class="block text-sm font-medium text-gray-700 mb-1">Visibility</label>
-                    <select name="is_public" id="is_public" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
-                        <option value="false" {% if not resume.is_public %}selected{% endif %}>Private</option>
-                        <option value="true" {% if resume.is_public %}selected{% endif %}>Public</option>
+                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select name="status" id="status" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                        <option value="draft" {% if resume.status == 'draft' %}selected{% endif %}>Draft</option>
+                        <option value="published" {% if resume.status == 'published' %}selected{% endif %}>Published</option>
                     </select>
                 </div>
             </div>
@@ -45,7 +88,7 @@
     <div class="mb-8">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-medium text-gray-900">Education</h2>
-            <button type="button" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            <button type="button" onclick="openModal('educationModal')" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                 <svg xmlns="http://www.w3.org/2000/svg" class="-ml-0.5 mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
@@ -59,24 +102,30 @@
                     <div class="p-4 hover:bg-gray-100">
                         <div class="flex justify-between">
                             <div>
-                                <h3 class="text-md font-medium text-gray-900">{{ education.degree }} in {{ education.field_of_study }}</h3>
-                                <p class="text-sm text-gray-500">{{ education.school }}</p>
+                                <h3 class="text-md font-medium text-gray-900">{{ education.degree }} {% if education.field_of_study %}in {{ education.field_of_study }}{% endif %}</h3>
+                                <p class="text-sm text-gray-500">{{ education.institution }}</p>
                                 <p class="text-sm text-gray-500">
                                     {{ education.start_date|date:"M Y" }} - 
-                                    {% if education.current %}Present{% else %}{{ education.end_date|date:"M Y" }}{% endif %}
+                                    {% if not education.end_date %}Present{% else %}{{ education.end_date|date:"M Y" }}{% endif %}
                                 </p>
                             </div>
                             <div class="flex space-x-2">
-                                <button type="button" class="text-blue-600 hover:text-blue-800">
+                                <button type="button" onclick="editEducation('{{ education.id }}')" class="text-blue-600 hover:text-blue-800">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
                                 </button>
-                                <button type="button" class="text-red-600 hover:text-red-800">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                </button>
+                                <form method="post" action="{% url 'edit_resume' resume.slug %}" class="inline" onsubmit="return confirm('Are you sure you want to delete this education entry?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="section" value="education">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="id" value="{{ education.id }}">
+                                    <button type="submit" class="text-red-600 hover:text-red-800">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -93,7 +142,7 @@
     <div class="mb-8">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-medium text-gray-900">Work Experience</h2>
-            <button type="button" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            <button type="button" onclick="openModal('experienceModal')" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                 <svg xmlns="http://www.w3.org/2000/svg" class="-ml-0.5 mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
@@ -107,7 +156,7 @@
                     <div class="p-4 hover:bg-gray-100">
                         <div class="flex justify-between">
                             <div>
-                                <h3 class="text-md font-medium text-gray-900">{{ experience.job_title }}</h3>
+                                <h3 class="text-md font-medium text-gray-900">{{ experience.position }}</h3>
                                 <p class="text-sm text-gray-500">{{ experience.company }}{% if experience.location %}, {{ experience.location }}{% endif %}</p>
                                 <p class="text-sm text-gray-500">
                                     {{ experience.start_date|date:"M Y" }} - 
@@ -115,16 +164,22 @@
                                 </p>
                             </div>
                             <div class="flex space-x-2">
-                                <button type="button" class="text-blue-600 hover:text-blue-800">
+                                <button type="button" onclick="editExperience('{{ experience.id }}')" class="text-blue-600 hover:text-blue-800">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
                                 </button>
-                                <button type="button" class="text-red-600 hover:text-red-800">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                </button>
+                                <form method="post" action="{% url 'edit_resume' resume.slug %}" class="inline" onsubmit="return confirm('Are you sure you want to delete this experience entry?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="section" value="experience">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="id" value="{{ experience.id }}">
+                                    <button type="submit" class="text-red-600 hover:text-red-800">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -141,7 +196,7 @@
     <div class="mb-8">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-medium text-gray-900">Skills</h2>
-            <button type="button" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            <button type="button" onclick="openModal('skillModal')" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                 <svg xmlns="http://www.w3.org/2000/svg" class="-ml-0.5 mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
@@ -157,11 +212,17 @@
                         {% if skill.level %}
                             <span class="ml-1 text-xs text-blue-600">({{ skill.level }})</span>
                         {% endif %}
-                        <button type="button" class="ml-1.5 text-blue-600 hover:text-blue-800">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
+                        <form method="post" action="{% url 'edit_resume' resume.slug %}" class="inline ml-1.5">
+                            {% csrf_token %}
+                            <input type="hidden" name="section" value="skill">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="id" value="{{ skill.id }}">
+                            <button type="submit" class="text-blue-600 hover:text-blue-800">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </form>
                     </div>
                 {% endfor %}
             </div>
@@ -176,7 +237,7 @@
     <div class="mb-8">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-medium text-gray-900">Projects</h2>
-            <button type="button" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            <button type="button" onclick="openModal('projectModal')" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                 <svg xmlns="http://www.w3.org/2000/svg" class="-ml-0.5 mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
@@ -193,28 +254,34 @@
                                 <h3 class="text-md font-medium text-gray-900">{{ project.title }}</h3>
                                 {% if project.start_date %}
                                     <p class="text-sm text-gray-500">
-                                        {{ project.start_date|date:"M Y" }} - 
-                                        {% if project.current %}Present{% else %}{{ project.end_date|date:"M Y" }}{% endif %}
+                                        {{ project.start_date|date:"M Y" }}
+                                        {% if project.end_date %} - {{ project.end_date|date:"M Y" }}{% endif %}
                                     </p>
                                 {% endif %}
                                 {% if project.description %}
                                     <p class="text-sm text-gray-600 mt-1">{{ project.description|truncatechars:100 }}</p>
                                 {% endif %}
-                                {% if project.link %}
-                                    <a href="{{ project.link }}" target="_blank" class="text-sm text-primary hover:underline mt-1 inline-block">View Project</a>
+                                {% if project.url %}
+                                    <a href="{{ project.url }}" target="_blank" class="text-sm text-primary hover:underline mt-1 inline-block">View Project</a>
                                 {% endif %}
                             </div>
                             <div class="flex space-x-2">
-                                <button type="button" class="text-blue-600 hover:text-blue-800">
+                                <button type="button" onclick="editProject('{{ project.id }}')" class="text-blue-600 hover:text-blue-800">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
                                 </button>
-                                <button type="button" class="text-red-600 hover:text-red-800">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                </button>
+                                <form method="post" action="{% url 'edit_resume' resume.slug %}" class="inline" onsubmit="return confirm('Are you sure you want to delete this project?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="section" value="project">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="id" value="{{ project.id }}">
+                                    <button type="submit" class="text-red-600 hover:text-red-800">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -231,7 +298,7 @@
     <div class="mb-8">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-medium text-gray-900">Certifications</h2>
-            <button type="button" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            <button type="button" onclick="openModal('certificationModal')" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                 <svg xmlns="http://www.w3.org/2000/svg" class="-ml-0.5 mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
@@ -246,9 +313,9 @@
                         <div class="flex justify-between">
                             <div>
                                 <h3 class="text-md font-medium text-gray-900">{{ certification.name }}</h3>
-                                <p class="text-sm text-gray-500">{{ certification.issuing_organization }}</p>
+                                <p class="text-sm text-gray-500">{{ certification.issuer }}</p>
                                 <p class="text-sm text-gray-500">
-                                    Issued: {{ certification.issue_date|date:"M Y" }}
+                                    Issued: {{ certification.date_issued|date:"M Y" }}
                                     {% if certification.expiration_date %}
                                         - Expires: {{ certification.expiration_date|date:"M Y" }}
                                     {% endif %}
@@ -258,16 +325,22 @@
                                 {% endif %}
                             </div>
                             <div class="flex space-x-2">
-                                <button type="button" class="text-blue-600 hover:text-blue-800">
+                                <button type="button" onclick="editCertification('{{ certification.id }}')" class="text-blue-600 hover:text-blue-800">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
                                 </button>
-                                <button type="button" class="text-red-600 hover:text-red-800">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                </button>
+                                <form method="post" action="{% url 'edit_resume' resume.slug %}" class="inline" onsubmit="return confirm('Are you sure you want to delete this certification?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="section" value="certification">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="id" value="{{ certification.id }}">
+                                    <button type="submit" class="text-red-600 hover:text-red-800">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -286,10 +359,322 @@
         </a>
         
         <div>
-            <a href="{% url 'export_pdf_resume' resume.slug %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            <button id="exportPdfButton" onclick="generateResumePdf('{{ resume.slug }}')" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                <svg id="pdfSpinner" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
                 Export as PDF
-            </a>
+            </button>
         </div>
     </div>
+    
 </div>
+
+<!-- Education Modal -->
+<div id="educationModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('educationModal')">&times;</span>
+        <h2 class="text-xl font-bold mb-4">Add Education</h2>
+        <form method="post" action="{% url 'edit_resume' resume.slug %}">
+            {% csrf_token %}
+            <input type="hidden" name="section" value="education">
+            <input type="hidden" name="action" value="add">
+            
+            <div class="grid grid-cols-1 gap-4">
+                <div>
+                    <label for="institution" class="block text-sm font-medium text-gray-700 mb-1">Institution</label>
+                    <input type="text" name="institution" id="institution" required class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                </div>
+                
+                <div>
+                    <label for="degree" class="block text-sm font-medium text-gray-700 mb-1">Degree</label>
+                    <input type="text" name="degree" id="degree" required class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                </div>
+                
+                <div>
+                    <label for="field_of_study" class="block text-sm font-medium text-gray-700 mb-1">Field of Study</label>
+                    <input type="text" name="field_of_study" id="field_of_study" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                        <input type="date" name="start_date" id="start_date" required class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                    
+                    <div>
+                        <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                        <input type="date" name="end_date" id="end_date" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea name="description" id="description" rows="3" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"></textarea>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button type="button" onclick="closeModal('educationModal')" class="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        Cancel
+                    </button>
+                    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        Add Education
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Experience Modal -->
+<div id="experienceModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('experienceModal')">&times;</span>
+        <h2 class="text-xl font-bold mb-4">Add Experience</h2>
+        <form method="post" action="{% url 'edit_resume' resume.slug %}">
+            {% csrf_token %}
+            <input type="hidden" name="section" value="experience">
+            <input type="hidden" name="action" value="add">
+            
+            <div class="grid grid-cols-1 gap-4">
+                <div>
+                    <label for="company" class="block text-sm font-medium text-gray-700 mb-1">Company</label>
+                    <input type="text" name="company" id="company" required class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                </div>
+                
+                <div>
+                    <label for="position" class="block text-sm font-medium text-gray-700 mb-1">Position</label>
+                    <input type="text" name="position" id="position" required class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                </div>
+                
+                <div>
+                    <label for="location" class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                    <input type="text" name="location" id="location" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                        <input type="date" name="start_date" id="exp_start_date" required class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                    
+                    <div>
+                        <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                        <input type="date" name="end_date" id="exp_end_date" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                </div>
+                
+                <div class="flex items-center">
+                    <input type="checkbox" name="current" id="current" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                    <label for="current" class="ml-2 block text-sm text-gray-700">I currently work here</label>
+                </div>
+                
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea name="description" id="exp_description" rows="3" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"></textarea>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button type="button" onclick="closeModal('experienceModal')" class="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        Cancel
+                    </button>
+                    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        Add Experience
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Skill Modal -->
+<div id="skillModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('skillModal')">&times;</span>
+        <h2 class="text-xl font-bold mb-4">Add Skill</h2>
+        <form method="post" action="{% url 'edit_resume' resume.slug %}">
+            {% csrf_token %}
+            <input type="hidden" name="section" value="skill">
+            <input type="hidden" name="action" value="add">
+            
+            <div class="grid grid-cols-1 gap-4">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Skill Name</label>
+                    <input type="text" name="name" id="skill_name" required class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                </div>
+                
+                <div>
+                    <label for="level" class="block text-sm font-medium text-gray-700 mb-1">Proficiency Level</label>
+                    <select name="level" id="level" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate" selected>Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                        <option value="expert">Expert</option>
+                    </select>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button type="button" onclick="closeModal('skillModal')" class="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        Cancel
+                    </button>
+                    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        Add Skill
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Project Modal -->
+<div id="projectModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('projectModal')">&times;</span>
+        <h2 class="text-xl font-bold mb-4">Add Project</h2>
+        <form method="post" action="{% url 'edit_resume' resume.slug %}">
+            {% csrf_token %}
+            <input type="hidden" name="section" value="project">
+            <input type="hidden" name="action" value="add">
+            
+            <div class="grid grid-cols-1 gap-4">
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Project Title</label>
+                    <input type="text" name="title" id="project_title" required class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                </div>
+                
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea name="description" id="project_description" rows="3" required class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"></textarea>
+                </div>
+                
+                <div>
+                    <label for="technologies" class="block text-sm font-medium text-gray-700 mb-1">Technologies Used</label>
+                    <input type="text" name="technologies" id="technologies" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                </div>
+                
+                <div>
+                    <label for="url" class="block text-sm font-medium text-gray-700 mb-1">Project URL</label>
+                    <input type="url" name="url" id="url" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                        <input type="date" name="start_date" id="project_start_date" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                    
+                    <div>
+                        <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                        <input type="date" name="end_date" id="project_end_date" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button type="button" onclick="closeModal('projectModal')" class="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        Cancel
+                    </button>
+                    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        Add Project
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Certification Modal -->
+<div id="certificationModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('certificationModal')">&times;</span>
+        <h2 class="text-xl font-bold mb-4">Add Certification</h2>
+        <form method="post" action="{% url 'edit_resume' resume.slug %}">
+            {% csrf_token %}
+            <input type="hidden" name="section" value="certification">
+            <input type="hidden" name="action" value="add">
+            
+            <div class="grid grid-cols-1 gap-4">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Certification Name</label>
+                    <input type="text" name="name" id="cert_name" required class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                </div>
+                
+                <div>
+                    <label for="issuer" class="block text-sm font-medium text-gray-700 mb-1">Issuing Organization</label>
+                    <input type="text" name="issuer" id="issuer" required class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="date_issued" class="block text-sm font-medium text-gray-700 mb-1">Date Issued</label>
+                        <input type="date" name="date_issued" id="date_issued" required class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                    
+                    <div>
+                        <label for="expiration_date" class="block text-sm font-medium text-gray-700 mb-1">Expiration Date</label>
+                        <input type="date" name="expiration_date" id="expiration_date" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="credential_id" class="block text-sm font-medium text-gray-700 mb-1">Credential ID</label>
+                    <input type="text" name="credential_id" id="credential_id" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                </div>
+                
+                <div>
+                    <label for="credential_url" class="block text-sm font-medium text-gray-700 mb-1">Credential URL</label>
+                    <input type="url" name="credential_url" id="credential_url" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                </div>
+                
+                <div class="flex justify-end">
+                    <button type="button" onclick="closeModal('certificationModal')" class="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        Cancel
+                    </button>
+                    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        Add Certification
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/resume_pdf.js' %}"></script>
+<script>
+    // Modal functions
+    function openModal(modalId) {
+        document.getElementById(modalId).style.display = "block";
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = "none";
+    }
+
+    // Close modals when clicking outside
+    window.onclick = function(event) {
+        const modals = document.getElementsByClassName("modal");
+        for (let i = 0; i < modals.length; i++) {
+            if (event.target == modals[i]) {
+                modals[i].style.display = "none";
+            }
+        }
+    }
+    
+    // Handle current job checkbox
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentCheckbox = document.getElementById('current');
+        const endDateInput = document.getElementById('exp_end_date');
+        
+        if (currentCheckbox && endDateInput) {
+            currentCheckbox.addEventListener('change', function() {
+                endDateInput.disabled = this.checked;
+                if (this.checked) {
+                    endDateInput.value = '';
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}
