@@ -1,0 +1,15 @@
+{% load static %}
+
+<div class="resume-content font-{{ font }} color-{{ color }}">
+    {% if template.name == "Modern" %}
+        {% include "resume_templates/modern.html" with resume=resume %}
+    {% elif template.name == "Professional" %}
+        {% include "resume_templates/professional.html" with resume=resume %}
+    {% elif template.name == "Creative" %}
+        {% include "resume_templates/creative.html" with resume=resume %}
+    {% elif template.name == "Minimal" %}
+        {% include "resume_templates/minimal.html" with resume=resume %}
+    {% else %}
+        {% include "resume_templates/classic.html" with resume=resume %}
+    {% endif %}
+</div>

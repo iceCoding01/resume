@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Share Your Resume - {{ resume.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .share-container {
+        max-width: 600px;
+    }
+    
+    .public-link-container {
+        background-color: #f9fafb;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .copy-btn {
+        transition: all 0.2s;
+    }
+    
+    .copy-btn:hover {
+        background-color: #4b5563;
+    }
+    
+    .success-message {
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+    }
+    
+    .success-message.show {
+        opacity: 1;
+    }
+    
+    .qr-container {
+        width: 180px;
+        height: 180px;
+        margin: 0 auto;
+        background-color: white;
+        padding: 10px;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-center">
+        <div class="share-container">
+            <h1 class="text-2xl font-bold text-gray-800 mb-6">Share Your Resume</h1>
+            
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-medium text-gray-900">Resume Visibility</h2>
+                    <div>
+                        <form method="post" id="visibility-form">
+                            {% csrf_token %}
+                            <button type="submit" class="{% if resume.is_public %}bg-red-600 hover:bg-red-700{% else %}bg-green-600 hover:bg-green-700{% endif %} text-white px-3 py-1 rounded-md text-sm font-medium">
+                                {% if resume.is_public %}
+                                Make Private
+                                {% else %}
+                                Make Public
+                                {% endif %}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <p class="text-gray-700 mb-4">
+                    {% if resume.is_public %}
+                    Your resume is currently <span class="font-medium text-green-600">public</span>. Anyone with the link can view it.
+                    {% else %}
+                    Your resume is currently <span class="font-medium text-red-600">private</span>. Only you can view it.
+                    {% endif %}
+                </p>
+                
+                {% if resume.is_public %}
+                <div class="mt-6">
+                    <label for="public-link" class="block text-sm font-medium text-gray-700 mb-2">Public Link</label>
+                    <div class="public-link-container flex rounded-md mb-2">
+                        <input type="text" id="public-link" value="{{ request.scheme }}://{{ request.get_host }}{% url 'public_resume' resume.share_token %}" readonly class="flex-grow bg-transparent border-0 focus:ring-0 px-3 py-2 text-gray-600 text-sm" />
+                        <button id="copy-btn" class="copy-btn bg-gray-700 text-white px-3 py-2 rounded-r-md text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                                <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="copy-success" class="success-message text-sm text-green-600 mb-4">Link copied to clipboard!</div>
+                    
+                    <div class="mt-6 mb-4">
+                        <h3 class="text-sm font-medium text-gray-700 mb-2">QR Code</h3>
+                        <div class="qr-container">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ request.scheme }}://{{ request.get_host }}{% url 'public_resume' resume.share_token %}" alt="QR Code" class="w-full h-full" />
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2 text-center">Scan to view resume</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">Share Options</h2>
+                
+                <div class="space-y-4">
+                    {% if resume.is_public %}
+                    <a href="mailto:?subject=Check%20out%20my%20resume&body=Hi%2C%0A%0AI%20wanted%20to%20share%20my%20resume%20with%20you.%20You%20can%20view%20it%20here%3A%0A%0A{{ request.scheme }}%3A%2F%2F{{ request.get_host }}{% url 'public_resume' resume.share_token %}%0A%0AThanks!" class="flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                        </svg>
+                        <span class="text-gray-700">Share via Email</span>
+                    </a>
+                    
+                    <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.scheme }}://{{ request.get_host }}{% url 'public_resume' resume.share_token %}" target="_blank" class="flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600 mr-3" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                        </svg>
+                        <span class="text-gray-700">Share on LinkedIn</span>
+                    </a>
+                    
+                    <a href="https://twitter.com/intent/tweet?text=Check%20out%20my%20resume&url={{ request.scheme }}://{{ request.get_host }}{% url 'public_resume' resume.share_token %}" target="_blank" class="flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-400 mr-3" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723 10.016 10.016 0 01-3.127 1.195 4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.937 4.937 0 004.604 3.417 9.868 9.868 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.054 0 13.999-7.496 13.999-13.986 0-.209 0-.42-.015-.63a9.936 9.936 0 002.46-2.548l-.047-.02z"/>
+                        </svg>
+                        <span class="text-gray-700">Share on Twitter</span>
+                    </a>
+                    {% else %}
+                    <div class="text-center p-4 bg-gray-50 rounded-md">
+                        <p class="text-gray-600 mb-4">Make your resume public to enable sharing options</p>
+                        <form method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                                Make Public
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="text-center mt-6">
+                <a href="{% url 'preview_resume' resume.id %}" class="text-blue-600 hover:text-blue-800 font-medium">
+                    &larr; Back to Resume Preview
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const copyBtn = document.getElementById('copy-btn');
+        const publicLink = document.getElementById('public-link');
+        const copySuccess = document.getElementById('copy-success');
+        
+        if (copyBtn) {
+            copyBtn.addEventListener('click', function() {
+                publicLink.select();
+                document.execCommand('copy');
+                
+                // Show success message
+                copySuccess.classList.add('show');
+                
+                // Hide after 3 seconds
+                setTimeout(function() {
+                    copySuccess.classList.remove('show');
+                }, 3000);
+            });
+        }
+    });
+</script>
+{% endblock %}

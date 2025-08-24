@@ -1,0 +1,266 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Preview Resume - {{ resume.title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/preview-resume.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Header with actions -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">Preview: {{ resume.title }}</h1>
+            <p class="text-sm text-gray-600">Created: {{ resume.created_at|date:"F j, Y" }}</p>
+        </div>
+        <div class="flex space-x-4">
+            <a href="{% url 'edit_resume' resume.id %}" class="btn-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                </svg>
+                Edit
+            </a>
+            <button id="download-pdf" class="btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd" />
+                </svg>
+                Download PDF
+            </button>
+            <div class="relative" x-data="{ open: false }">
+                <button @click="open = !open" class="btn-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                    </svg>
+                    Options
+                </button>
+                <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+                    <div class="py-1">
+                        <a href="{% url 'share_resume' resume.id %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            Share Resume
+                        </a>
+                        <a href="{% url 'resume_analytics' resume.id %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            View Analytics
+                        </a>
+                        <button id="duplicate-resume" data-resume-id="{{ resume.id }}" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            Duplicate Resume
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview controls -->
+    <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+        <div class="flex justify-between items-center">
+            <div class="flex space-x-4">
+                <div>
+                    <label for="template-select" class="block text-sm font-medium text-gray-700 mb-1">Template</label>
+                    <select id="template-select" class="form-select">
+                        {% for template in available_templates %}
+                            <option value="{{ template.id }}" {% if template.id == resume.template.id %}selected{% endif %}>
+                                {{ template.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="font-select" class="block text-sm font-medium text-gray-700 mb-1">Font</label>
+                    <select id="font-select" class="form-select">
+                        <option value="helvetica">Helvetica</option>
+                        <option value="georgia">Georgia</option>
+                        <option value="calibri">Calibri</option>
+                        <option value="arial">Arial</option>
+                        <option value="times">Times New Roman</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="color-select" class="block text-sm font-medium text-gray-700 mb-1">Accent Color</label>
+                    <select id="color-select" class="form-select">
+                        <option value="blue">Blue</option>
+                        <option value="green">Green</option>
+                        <option value="red">Red</option>
+                        <option value="purple">Purple</option>
+                        <option value="gray">Gray</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <button id="apply-changes" class="btn-secondary">Apply Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resume preview container -->
+    <div class="flex justify-center">
+        <div id="resume-preview" class="bg-white rounded-lg shadow-xl p-8 mb-8 max-w-4xl w-full mx-auto resume-paper">
+            <!-- Resume content will be loaded here via JavaScript -->
+            <div class="flex justify-center items-center h-full">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF generation status modal -->
+    <div id="pdf-modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex justify-center items-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <div id="pdf-loading" class="text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Generating your PDF</h3>
+                <p class="text-gray-600">Please wait while we prepare your resume...</p>
+            </div>
+            <div id="pdf-success" class="text-center hidden">
+                <svg class="h-12 w-12 text-green-500 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">PDF Generated Successfully!</h3>
+                <p class="text-gray-600 mb-4">Your resume PDF is ready to download.</p>
+                <div class="flex justify-center">
+                    <a id="download-link" href="#" class="btn-primary w-full" download>Download Now</a>
+                </div>
+            </div>
+            <div id="pdf-error" class="text-center hidden">
+                <svg class="h-12 w-12 text-red-500 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Something Went Wrong</h3>
+                <p id="error-message" class="text-gray-600 mb-4">There was an error generating your PDF. Please try again.</p>
+                <div class="flex justify-center">
+                    <button id="close-error" class="btn-secondary w-full">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const resumeId = {{ resume.id }};
+        const previewContainer = document.getElementById('resume-preview');
+        const downloadBtn = document.getElementById('download-pdf');
+        const templateSelect = document.getElementById('template-select');
+        const fontSelect = document.getElementById('font-select');
+        const colorSelect = document.getElementById('color-select');
+        const applyChangesBtn = document.getElementById('apply-changes');
+        const pdfModal = document.getElementById('pdf-modal');
+        const pdfLoading = document.getElementById('pdf-loading');
+        const pdfSuccess = document.getElementById('pdf-success');
+        const pdfError = document.getElementById('pdf-error');
+        const downloadLink = document.getElementById('download-link');
+        const closeError = document.getElementById('close-error');
+        const duplicateBtn = document.getElementById('duplicate-resume');
+
+        // Load resume preview
+        function loadResumePreview() {
+            previewContainer.innerHTML = '<div class="flex justify-center items-center h-full"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div></div>';
+            
+            const params = new URLSearchParams({
+                template_id: templateSelect.value,
+                font: fontSelect.value,
+                color: colorSelect.value
+            });
+            
+            fetch(`/resume/${resumeId}/preview?${params.toString()}`)
+                .then(response => response.text())
+                .then(html => {
+                    previewContainer.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error loading preview:', error);
+                    previewContainer.innerHTML = '<div class="text-center text-red-500">Error loading preview. Please try again.</div>';
+                });
+        }
+
+        // Apply template and style changes
+        applyChangesBtn.addEventListener('click', loadResumePreview);
+
+        // Generate PDF
+        downloadBtn.addEventListener('click', function() {
+            pdfModal.classList.remove('hidden');
+            pdfLoading.classList.remove('hidden');
+            pdfSuccess.classList.add('hidden');
+            pdfError.classList.add('hidden');
+            
+            const params = new URLSearchParams({
+                template_id: templateSelect.value,
+                font: fontSelect.value,
+                color: colorSelect.value
+            });
+            
+            fetch(`/resume/${resumeId}/generate-pdf?${params.toString()}`)
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            throw new Error(data.error || 'Error generating PDF');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    pdfLoading.classList.add('hidden');
+                    pdfSuccess.classList.remove('hidden');
+                    downloadLink.href = data.pdf_url;
+                })
+                .catch(error => {
+                    console.error('Error generating PDF:', error);
+                    pdfLoading.classList.add('hidden');
+                    pdfError.classList.remove('hidden');
+                    document.getElementById('error-message').textContent = error.message || 'There was an error generating your PDF. Please try again.';
+                });
+        });
+
+        // Close error message
+        closeError.addEventListener('click', function() {
+            pdfModal.classList.add('hidden');
+        });
+
+        // Duplicate resume
+        duplicateBtn.addEventListener('click', function() {
+            const resumeId = this.getAttribute('data-resume-id');
+            fetch(`/resume/${resumeId}/duplicate`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error duplicating resume');
+                }
+                return response.json();
+            })
+            .then(data => {
+                window.location.href = `/resume/${data.new_resume_id}/edit`;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to duplicate resume. Please try again.');
+            });
+        });
+
+        // Get CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Initial load
+        loadResumePreview();
+    });
+</script>
+{% endblock %}

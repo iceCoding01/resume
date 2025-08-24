@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ resume.title }} - {{ profile.full_name }}</title>
+    <style>
+        /* Base styles */
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.4;
+            color: #333;
+            max-width: 8.5in;
+            margin: 0 auto;
+            padding: 0.5in;
+        }
+        
+        /* Header styles */
+        header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 1rem;
+        }
+        
+        h1 {
+            font-size: 24pt;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+            color: #2c3e50;
+        }
+        
+        .contact-info {
+            font-size: 10pt;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .contact-info span {
+            margin: 0 0.5rem;
+        }
+        
+        /* Section styles */
+        section {
+            margin-bottom: 1.25rem;
+        }
+        
+        h2 {
+            font-size: 14pt;
+            text-transform: uppercase;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.25rem;
+            margin-bottom: 0.75rem;
+            color: #3498db;
+        }
+        
+        /* Item styles */
+        .item {
+            margin-bottom: 1rem;
+        }
+        
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 0.25rem;
+        }
+        
+        .item-title {
+            font-weight: bold;
+            font-size: 11pt;
+        }
+        
+        .item-subtitle {
+            font-style: italic;
+            font-size: 11pt;
+        }
+        
+        .item-date {
+            font-size: 10pt;
+            color: #666;
+        }
+        
+        .item-description {
+            font-size: 10pt;
+            margin-top: 0.25rem;
+            white-space: pre-line;
+        }
+        
+        /* Custom template styles (will be replaced with template-specific CSS) */
+        {% if resume.template.css_file %}
+        {{ resume.template.css_file }}
+        {% endif %}
+    </style>
+</head>
+<body>
+    <header>
+        <h1>{{ profile.full_name }}</h1>
+        <div class="contact-info">
+            {% if profile.email %}
+            <span>{{ profile.email }}</span>
+            {% endif %}
+            
+            {% if profile.phone %}
+            <span>{{ profile.phone }}</span>
+            {% endif %}
+            
+            {% if profile.location %}
+            <span>{{ profile.location }}</span>
+            {% endif %}
+            
+            {% if profile.website %}
+            <span>{{ profile.website }}</span>
+            {% endif %}
+            
+            {% if profile.linkedin %}
+            <span>{{ profile.linkedin }}</span>
+            {% endif %}
+        </div>
+    </header>
+    
+    {% if resume.summary %}
+    <section class="summary">
+        <h2>Summary</h2>
+        <p>{{ resume.summary }}</p>
+    </section>
+    {% endif %}
+    
+    {% for section in sections %}
+    <section class="resume-section">
+        <h2>{{ section.title }}</h2>
+        
+        {% for item in section.items.all %}
+        <div class="item">
+            <div class="item-header">
+                <div>
+                    {% if item.title %}
+                    <span class="item-title">{{ item.title }}</span>
+                    {% endif %}
+                    
+                    {% if item.subtitle %}
+                    <span class="item-subtitle">{{ item.subtitle }}</span>
+                    {% endif %}
+                </div>
+                
+                {% if item.date_range %}
+                <span class="item-date">{{ item.date_range }}</span>
+                {% endif %}
+            </div>
+            
+            {% if item.description %}
+            <div class="item-description">{{ item.description }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </section>
+    {% endfor %}
+</body>
+</html>

@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="bg-white shadow rounded-lg p-8 mb-8 max-w-3xl mx-auto">
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">{{ resume.title }}</h1>
+        <p class="text-gray-500">Created by {{ resume.user_profile.full_name }}</p>
+    </div>
+    
+    <div class="mb-8">
+        <div class="flex justify-center">
+            <div class="text-center">
+                <h2 class="text-2xl font-bold text-gray-800">{{ resume.user_profile.full_name }}</h2>
+                <p class="text-gray-600">{{ resume.user_profile.email }}</p>
+                {% if resume.user_profile.phone %}
+                    <p class="text-gray-600">{{ resume.user_profile.phone }}</p>
+                {% endif %}
+                {% if resume.user_profile.location %}
+                    <p class="text-gray-600">{{ resume.user_profile.location }}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if resume.user_profile.summary %}
+            <div class="mt-6">
+                <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-3">Professional Summary</h3>
+                <p class="text-gray-700">{{ resume.user_profile.summary }}</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    {% if resume.experiences.exists %}
+        <div class="mb-8">
+            <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-3">Work Experience</h3>
+            {% for experience in resume.experiences.all %}
+                <div class="mb-6">
+                    <div class="flex justify-between">
+                        <h4 class="text-md font-semibold text-gray-800">{{ experience.job_title }}</h4>
+                        <span class="text-sm text-gray-600">
+                            {{ experience.start_date|date:"M Y" }} - 
+                            {% if experience.current %}Present{% else %}{{ experience.end_date|date:"M Y" }}{% endif %}
+                        </span>
+                    </div>
+                    <p class="text-gray-700">{{ experience.company }}{% if experience.location %}, {{ experience.location }}{% endif %}</p>
+                    {% if experience.description %}
+                        <p class="text-gray-600 mt-2">{{ experience.description }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    {% if resume.educations.exists %}
+        <div class="mb-8">
+            <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-3">Education</h3>
+            {% for education in resume.educations.all %}
+                <div class="mb-6">
+                    <div class="flex justify-between">
+                        <h4 class="text-md font-semibold text-gray-800">{{ education.school }}</h4>
+                        <span class="text-sm text-gray-600">
+                            {{ education.start_date|date:"M Y" }} - 
+                            {% if education.current %}Present{% else %}{{ education.end_date|date:"M Y" }}{% endif %}
+                        </span>
+                    </div>
+                    <p class="text-gray-700">{{ education.degree }} in {{ education.field_of_study }}</p>
+                    {% if education.gpa %}
+                        <p class="text-gray-600">GPA: {{ education.gpa }}</p>
+                    {% endif %}
+                    {% if education.description %}
+                        <p class="text-gray-600 mt-2">{{ education.description }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    {% if resume.skills.exists %}
+        <div class="mb-8">
+            <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-3">Skills</h3>
+            <div class="flex flex-wrap gap-2">
+                {% for skill in resume.skills.all %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                        {{ skill.name }}
+                        {% if skill.level %}
+                            <span class="ml-1 text-xs text-blue-600">({{ skill.get_level_display }})</span>
+                        {% endif %}
+                    </span>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    
+    {% if resume.projects.exists %}
+        <div class="mb-8">
+            <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-3">Projects</h3>
+            {% for project in resume.projects.all %}
+                <div class="mb-6">
+                    <div class="flex justify-between">
+                        <h4 class="text-md font-semibold text-gray-800">{{ project.title }}</h4>
+                        {% if project.start_date %}
+                            <span class="text-sm text-gray-600">
+                                {{ project.start_date|date:"M Y" }} - 
+                                {% if project.current %}Present{% else %}{{ project.end_date|date:"M Y" }}{% endif %}
+                            </span>
+                        {% endif %}
+                    </div>
+                    {% if project.description %}
+                        <p class="text-gray-600 mt-2">{{ project.description }}</p>
+                    {% endif %}
+                    {% if project.link %}
+                        <a href="{{ project.link }}" target="_blank" class="text-primary hover:underline mt-2 inline-block">View Project</a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    {% if resume.certifications.exists %}
+        <div class="mb-8">
+            <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-3">Certifications</h3>
+            {% for certification in resume.certifications.all %}
+                <div class="mb-6">
+                    <div class="flex justify-between">
+                        <h4 class="text-md font-semibold text-gray-800">{{ certification.name }}</h4>
+                        <span class="text-sm text-gray-600">
+                            Issued: {{ certification.issue_date|date:"M Y" }}
+                            {% if certification.expiration_date %}
+                                - Expires: {{ certification.expiration_date|date:"M Y" }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    <p class="text-gray-700">{{ certification.issuing_organization }}</p>
+                    {% if certification.credential_id %}
+                        <p class="text-gray-600 mt-1">Credential ID: {{ certification.credential_id }}</p>
+                    {% endif %}
+                    {% if certification.credential_url %}
+                        <a href="{{ certification.credential_url }}" target="_blank" class="text-primary hover:underline mt-1 inline-block">View Credential</a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    {% if is_owner %}
+        <div class="flex justify-between mt-8">
+            <a href="{% url 'edit_resume' resume.slug %}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                Edit Resume
+            </a>
+            
+            <a href="{% url 'export_pdf_resume' resume.slug %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                Export as PDF
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

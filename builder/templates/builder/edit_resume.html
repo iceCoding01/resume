@@ -1,0 +1,295 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="bg-white shadow rounded-lg p-6 mb-8">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">Edit Resume: {{ resume.title }}</h1>
+        <div>
+            <a href="{% url 'view_resume' resume.slug %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                Preview
+            </a>
+        </div>
+    </div>
+    
+    <div class="mb-8">
+        <h2 class="text-lg font-medium text-gray-900 mb-4">Basic Information</h2>
+        <form method="post" action="#" class="space-y-4">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Resume Title</label>
+                    <input type="text" name="title" id="title" value="{{ resume.title }}" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                </div>
+                
+                <div>
+                    <label for="is_public" class="block text-sm font-medium text-gray-700 mb-1">Visibility</label>
+                    <select name="is_public" id="is_public" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                        <option value="false" {% if not resume.is_public %}selected{% endif %}>Private</option>
+                        <option value="true" {% if resume.is_public %}selected{% endif %}>Public</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="flex justify-end">
+                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Education Section -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-medium text-gray-900">Education</h2>
+            <button type="button" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" class="-ml-0.5 mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Add Education
+            </button>
+        </div>
+        
+        {% if educations %}
+            <div class="bg-gray-50 rounded-lg divide-y divide-gray-200">
+                {% for education in educations %}
+                    <div class="p-4 hover:bg-gray-100">
+                        <div class="flex justify-between">
+                            <div>
+                                <h3 class="text-md font-medium text-gray-900">{{ education.degree }} in {{ education.field_of_study }}</h3>
+                                <p class="text-sm text-gray-500">{{ education.school }}</p>
+                                <p class="text-sm text-gray-500">
+                                    {{ education.start_date|date:"M Y" }} - 
+                                    {% if education.current %}Present{% else %}{{ education.end_date|date:"M Y" }}{% endif %}
+                                </p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button type="button" class="text-blue-600 hover:text-blue-800">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </button>
+                                <button type="button" class="text-red-600 hover:text-red-800">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-4 bg-gray-50 rounded-lg">
+                <p class="text-gray-500">No education entries yet. Click 'Add Education' to get started.</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Experience Section -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-medium text-gray-900">Work Experience</h2>
+            <button type="button" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" class="-ml-0.5 mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Add Experience
+            </button>
+        </div>
+        
+        {% if experiences %}
+            <div class="bg-gray-50 rounded-lg divide-y divide-gray-200">
+                {% for experience in experiences %}
+                    <div class="p-4 hover:bg-gray-100">
+                        <div class="flex justify-between">
+                            <div>
+                                <h3 class="text-md font-medium text-gray-900">{{ experience.job_title }}</h3>
+                                <p class="text-sm text-gray-500">{{ experience.company }}{% if experience.location %}, {{ experience.location }}{% endif %}</p>
+                                <p class="text-sm text-gray-500">
+                                    {{ experience.start_date|date:"M Y" }} - 
+                                    {% if experience.current %}Present{% else %}{{ experience.end_date|date:"M Y" }}{% endif %}
+                                </p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button type="button" class="text-blue-600 hover:text-blue-800">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </button>
+                                <button type="button" class="text-red-600 hover:text-red-800">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-4 bg-gray-50 rounded-lg">
+                <p class="text-gray-500">No experience entries yet. Click 'Add Experience' to get started.</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Skills Section -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-medium text-gray-900">Skills</h2>
+            <button type="button" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" class="-ml-0.5 mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Add Skill
+            </button>
+        </div>
+        
+        {% if skills %}
+            <div class="flex flex-wrap gap-2">
+                {% for skill in skills %}
+                    <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                        {{ skill.name }}
+                        {% if skill.level %}
+                            <span class="ml-1 text-xs text-blue-600">({{ skill.level }})</span>
+                        {% endif %}
+                        <button type="button" class="ml-1.5 text-blue-600 hover:text-blue-800">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-4 bg-gray-50 rounded-lg">
+                <p class="text-gray-500">No skills added yet. Click 'Add Skill' to get started.</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Projects Section -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-medium text-gray-900">Projects</h2>
+            <button type="button" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" class="-ml-0.5 mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Add Project
+            </button>
+        </div>
+        
+        {% if projects %}
+            <div class="bg-gray-50 rounded-lg divide-y divide-gray-200">
+                {% for project in projects %}
+                    <div class="p-4 hover:bg-gray-100">
+                        <div class="flex justify-between">
+                            <div>
+                                <h3 class="text-md font-medium text-gray-900">{{ project.title }}</h3>
+                                {% if project.start_date %}
+                                    <p class="text-sm text-gray-500">
+                                        {{ project.start_date|date:"M Y" }} - 
+                                        {% if project.current %}Present{% else %}{{ project.end_date|date:"M Y" }}{% endif %}
+                                    </p>
+                                {% endif %}
+                                {% if project.description %}
+                                    <p class="text-sm text-gray-600 mt-1">{{ project.description|truncatechars:100 }}</p>
+                                {% endif %}
+                                {% if project.link %}
+                                    <a href="{{ project.link }}" target="_blank" class="text-sm text-primary hover:underline mt-1 inline-block">View Project</a>
+                                {% endif %}
+                            </div>
+                            <div class="flex space-x-2">
+                                <button type="button" class="text-blue-600 hover:text-blue-800">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </button>
+                                <button type="button" class="text-red-600 hover:text-red-800">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-4 bg-gray-50 rounded-lg">
+                <p class="text-gray-500">No projects added yet. Click 'Add Project' to get started.</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Certifications Section -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-medium text-gray-900">Certifications</h2>
+            <button type="button" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" class="-ml-0.5 mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Add Certification
+            </button>
+        </div>
+        
+        {% if certifications %}
+            <div class="bg-gray-50 rounded-lg divide-y divide-gray-200">
+                {% for certification in certifications %}
+                    <div class="p-4 hover:bg-gray-100">
+                        <div class="flex justify-between">
+                            <div>
+                                <h3 class="text-md font-medium text-gray-900">{{ certification.name }}</h3>
+                                <p class="text-sm text-gray-500">{{ certification.issuing_organization }}</p>
+                                <p class="text-sm text-gray-500">
+                                    Issued: {{ certification.issue_date|date:"M Y" }}
+                                    {% if certification.expiration_date %}
+                                        - Expires: {{ certification.expiration_date|date:"M Y" }}
+                                    {% endif %}
+                                </p>
+                                {% if certification.credential_url %}
+                                    <a href="{{ certification.credential_url }}" target="_blank" class="text-sm text-primary hover:underline mt-1 inline-block">View Credential</a>
+                                {% endif %}
+                            </div>
+                            <div class="flex space-x-2">
+                                <button type="button" class="text-blue-600 hover:text-blue-800">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </button>
+                                <button type="button" class="text-red-600 hover:text-red-800">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-4 bg-gray-50 rounded-lg">
+                <p class="text-gray-500">No certifications added yet. Click 'Add Certification' to get started.</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="flex justify-between mt-8">
+        <a href="{% url 'dashboard' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            Back to Dashboard
+        </a>
+        
+        <div>
+            <a href="{% url 'export_pdf_resume' resume.slug %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                Export as PDF
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

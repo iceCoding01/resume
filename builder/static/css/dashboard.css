@@ -1,0 +1,69 @@
+/* Dashboard Styles */
+
+/* Fade-in animation for content */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.max-w-7xl {
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* Enhance hover states for better interaction feedback */
+.resume-row {
+  transition: all 0.2s ease;
+}
+
+.resume-row:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Make action buttons more compact on small screens */
+@media (max-width: 640px) {
+  .space-x-2 {
+    column-gap: 0.25rem;
+  }
+  
+  td.px-6 {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
+
+/* Custom scrollbar for tables */
+.overflow-x-auto::-webkit-scrollbar {
+  height: 6px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Enhance accessibility for form elements */
+input:focus, select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+/* Style for empty state illustration */
+[class*="h-16.w-16.mx-auto"] {
+  opacity: 0.7;
+}

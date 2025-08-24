@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <g id="resume-dashboard-illustration">
+    <rect width="800" height="600" fill="none"/>
+    <path d="M450 100H700C711.046 100 720 108.954 720 120V480C720 491.046 711.046 500 700 500H450V100Z" fill="#E0E7FF"/>
+    <rect x="80" y="100" width="340" height="400" rx="20" fill="#F9FAFB"/>
+    <rect x="110" y="160" width="280" height="30" rx="4" fill="#E5E7EB"/>
+    <rect x="110" y="210" width="200" height="30" rx="4" fill="#E5E7EB"/>
+    <rect x="110" y="260" width="240" height="30" rx="4" fill="#E5E7EB"/>
+    <rect x="110" y="310" width="220" height="30" rx="4" fill="#E5E7EB"/>
+    <rect x="110" y="360" width="260" height="30" rx="4" fill="#E5E7EB"/>
+    <rect x="110" y="410" width="180" height="30" rx="4" fill="#E5E7EB"/>
+    <circle cx="360" cy="140" r="16" fill="#3B82F6"/>
+    <path d="M353 140L358 145L368 135" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="360" cy="190" r="16" fill="#3B82F6"/>
+    <path d="M353 190L358 195L368 185" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="480" y="140" width="220" height="140" rx="8" fill="#F3F4F6"/>
+    <rect x="500" y="160" width="180" height="20" rx="4" fill="#D1D5DB"/>
+    <rect x="500" y="190" width="140" height="20" rx="4" fill="#D1D5DB"/>
+    <rect x="500" y="220" width="160" height="20" rx="4" fill="#D1D5DB"/>
+    <rect x="500" y="250" width="120" height="20" rx="4" fill="#D1D5DB"/>
+    <rect x="480" y="310" width="220" height="160" rx="8" fill="#F3F4F6"/>
+    <path d="M580 350C580 366.569 566.569 380 550 380C533.431 380 520 366.569 520 350C520 333.431 533.431 320 550 320C566.569 320 580 333.431 580 350Z" fill="#3B82F6"/>
+    <path d="M545 340L550 345L565 330" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="590" y="330" width="90" height="16" rx="4" fill="#D1D5DB"/>
+    <rect x="590" y="360" width="70" height="16" rx="4" fill="#D1D5DB"/>
+    <path d="M440 130C440 124.477 444.477 120 450 120H460V480H450C444.477 480 440 475.523 440 470V130Z" fill="#BFDBFE"/>
+    <circle cx="450" cy="220" r="5" fill="#3B82F6"/>
+    <circle cx="450" cy="260" r="5" fill="#3B82F6"/>
+    <circle cx="450" cy="300" r="5" fill="#3B82F6"/>
+    <circle cx="450" cy="340" r="5" fill="#3B82F6"/>
+    <circle cx="450" cy="380" r="5" fill="#3B82F6"/>
+  </g>
+</svg>
