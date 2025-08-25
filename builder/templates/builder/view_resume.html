@@ -1,155 +1,487 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/preview-resume.css' %}">
+<style>
+    /* Modern Resume Preview Styles */
+    body {
+        background-color: #f8fafc;
+    }
+    
+    .resume-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0;
+    }
+    
+    .resume-preview-header {
+        background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+        padding: 3rem 0;
+        border-radius: 0.5rem 0.5rem 0 0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .resume-preview-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+        opacity: 0.8;
+    }
+    
+    .resume-paper {
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .resume-paper:hover {
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        transform: translateY(-4px);
+    }
+    
+    .section-title {
+        position: relative;
+        padding-bottom: 0.75rem;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        color: #1e3a8a;
+    }
+    
+    .section-title::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        height: 3px;
+        width: 50px;
+        background: linear-gradient(90deg, #0ea5e9, #3b82f6);
+        border-radius: 3px;
+    }
+    
+    .resume-actions {
+        transition: all 0.3s ease;
+    }
+    
+    .skill-tag {
+        transition: all 0.2s ease;
+    }
+    
+    .skill-tag:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding-left: 28px;
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 6px;
+        height: 12px;
+        width: 12px;
+        border-radius: 50%;
+        background-color: #0ea5e9;
+        z-index: 1;
+    }
+    
+    .timeline-item::after {
+        content: '';
+        position: absolute;
+        left: 5px;
+        top: 24px;
+        bottom: 0;
+        width: 2px;
+        background-color: #e5e7eb;
+        z-index: 0;
+    }
+    
+    .timeline-item:last-child::after {
+        display: none;
+    }
+    
+    .contact-link {
+        display: inline-flex;
+        align-items: center;
+        margin-right: 1rem;
+        transition: all 0.2s ease;
+    }
+    
+    .contact-link:hover {
+        color: #0ea5e9;
+    }
+    
+    .resume-toolbar {
+        backdrop-filter: blur(10px);
+        background-color: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(229, 231, 235, 0.5);
+    }
+    
+    @media print {
+        .resume-toolbar, .resume-preview-header, footer {
+            display: none !important;
+        }
+        
+        .resume-paper {
+            box-shadow: none !important;
+            margin: 0 !important;
+            max-width: 100% !important;
+        }
+        
+        body {
+            background-color: white !important;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="bg-white shadow rounded-lg p-8 mb-8 max-w-3xl mx-auto">
-    <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">{{ resume.title }}</h1>
-        <p class="text-gray-500">Created by {{ resume.user_profile.full_name }}</p>
+<div class="resume-container">
+    <!-- Resume Preview Header -->
+    <div class="resume-preview-header text-center mb-8">
+        <div class="relative z-10">
+            <h1 class="text-4xl font-bold text-white mb-2">{{ resume.title }}</h1>
+            <p class="text-blue-100">Created by {{ resume.user_profile.full_name }}</p>
+            
+            {% if is_owner %}
+            <div class="mt-6 flex justify-center space-x-4">
+                <a href="{% url 'edit_resume' resume.slug %}" class="inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-full shadow-sm text-blue-700 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-200 transition-all duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    Edit Resume
+                </a>
+                <a href="{% url 'export_pdf_resume' resume.slug %}" class="inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Download PDF
+                </a>
+            </div>
+            {% endif %}
+        </div>
     </div>
     
-    <div class="mb-8">
-        <div class="flex justify-center">
-            <div class="text-center">
-                <h2 class="text-2xl font-bold text-gray-800">{{ resume.user_profile.full_name }}</h2>
-                <p class="text-gray-600">{{ resume.user_profile.email }}</p>
-                {% if resume.user_profile.phone %}
-                    <p class="text-gray-600">{{ resume.user_profile.phone }}</p>
-                {% endif %}
-                {% if resume.user_profile.location %}
-                    <p class="text-gray-600">{{ resume.user_profile.location }}</p>
-                {% endif %}
+    <!-- Resume Paper -->
+    <div class="resume-paper max-w-4xl mx-auto p-10 mb-12">
+        <!-- Profile Header -->
+        <div class="mb-10">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div class="md:max-w-2xl">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">{{ resume.user_profile.full_name }}</h2>
+                    <div class="flex flex-wrap items-center mt-4 text-gray-600 text-sm">
+                        <span class="contact-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            {{ resume.user_profile.email }}
+                        </span>
+                        {% if resume.user_profile.phone %}
+                        <span class="contact-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                            {{ resume.user_profile.phone }}
+                        </span>
+                        {% endif %}
+                        {% if resume.user_profile.location %}
+                        <span class="contact-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            {{ resume.user_profile.location }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-        </div>
         
         {% if resume.user_profile.summary %}
-            <div class="mt-6">
-                <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-3">Professional Summary</h3>
-                <p class="text-gray-700">{{ resume.user_profile.summary }}</p>
+            <div class="mt-8">
+                <h3 class="section-title text-xl">Professional Summary</h3>
+                <p class="text-gray-700 leading-relaxed">{{ resume.user_profile.summary }}</p>
             </div>
         {% endif %}
-    </div>
+        </div>
     
-    {% if experiences %}
-        <div class="mb-8">
-            <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-3">Work Experience</h3>
-            {% for experience in experiences %}
-                <div class="mb-6">
-                    <div class="flex justify-between">
-                        <h4 class="text-md font-semibold text-gray-800">{{ experience.position }}</h4>
-                        <span class="text-sm text-gray-600">
+        <!-- Experience Section -->
+        {% if experiences %}
+        <div class="mb-10">
+            <h3 class="section-title text-xl">Professional Experience</h3>
+            <div class="space-y-6">
+                {% for experience in experiences %}
+                <div class="timeline-item pb-8">
+                    <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-2">
+                        <h4 class="text-lg font-semibold text-gray-800">{{ experience.position }}</h4>
+                        <span class="text-sm text-gray-600 font-medium bg-blue-50 px-3 py-1 rounded-full">
                             {{ experience.start_date|date:"M Y" }} - 
                             {% if experience.current %}Present{% else %}{{ experience.end_date|date:"M Y" }}{% endif %}
                         </span>
                     </div>
-                    <p class="text-gray-700">{{ experience.company }}{% if experience.location %}, {{ experience.location }}{% endif %}</p>
+                    <p class="text-gray-700 font-medium">{{ experience.company }}{% if experience.location %}, {{ experience.location }}{% endif %}</p>
                     {% if experience.description %}
-                        <p class="text-gray-600 mt-2">{{ experience.description }}</p>
+                    <div class="mt-3 text-gray-600 prose prose-sm">
+                        {{ experience.description|linebreaks }}
+                    </div>
                     {% endif %}
                 </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
         </div>
-    {% endif %}
-    
-    {% if educations %}
-        <div class="mb-8">
-            <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-3">Education</h3>
-            {% for education in educations %}
-                <div class="mb-6">
-                    <div class="flex justify-between">
-                        <h4 class="text-md font-semibold text-gray-800">{{ education.institution }}</h4>
-                        <span class="text-sm text-gray-600">
+        {% endif %}
+        
+        <!-- Education Section -->
+        {% if educations %}
+        <div class="mb-10">
+            <h3 class="section-title text-xl">Education</h3>
+            <div class="space-y-6">
+                {% for education in educations %}
+                <div class="timeline-item pb-8">
+                    <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-2">
+                        <h4 class="text-lg font-semibold text-gray-800">{{ education.institution }}</h4>
+                        <span class="text-sm text-gray-600 font-medium bg-blue-50 px-3 py-1 rounded-full">
                             {{ education.start_date|date:"M Y" }} - 
                             {% if education.end_date %}{{ education.end_date|date:"M Y" }}{% else %}Present{% endif %}
                         </span>
                     </div>
-                    <p class="text-gray-700">{{ education.degree }}{% if education.field_of_study %} in {{ education.field_of_study }}{% endif %}</p>
+                    <p class="text-gray-700 font-medium">{{ education.degree }}{% if education.field_of_study %} in {{ education.field_of_study }}{% endif %}</p>
                     {% if education.description %}
-                        <p class="text-gray-600 mt-2">{{ education.description }}</p>
+                    <div class="mt-3 text-gray-600 prose prose-sm">
+                        {{ education.description|linebreaks }}
+                    </div>
                     {% endif %}
                 </div>
-            {% endfor %}
-        </div>
-    {% endif %}
-    
-    {% if skills %}
-        <div class="mb-8">
-            <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-3">Skills</h3>
-            <div class="flex flex-wrap gap-2">
-                {% for skill in skills %}
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                        {{ skill.name }}
-                        {% if skill.level %}
-                            <span class="ml-1 text-xs text-blue-600">({{ skill.get_level_display }})</span>
-                        {% endif %}
-                    </span>
                 {% endfor %}
             </div>
         </div>
-    {% endif %}
-    
-    {% if projects %}
-        <div class="mb-8">
-            <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-3">Projects</h3>
-            {% for project in projects %}
-                <div class="mb-6">
-                    <div class="flex justify-between">
-                        <h4 class="text-md font-semibold text-gray-800">{{ project.title }}</h4>
+        {% endif %}
+        
+        <!-- Skills Section -->
+        {% if skills %}
+        <div class="mb-10">
+            <h3 class="section-title text-xl">Skills</h3>
+            <div class="flex flex-wrap gap-2">
+                {% for skill in skills %}
+                <span class="skill-tag inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 border border-blue-200">
+                    {{ skill.name }}
+                    {% if skill.level %}
+                    <span class="ml-2 px-2 py-0.5 text-xs bg-blue-200 text-blue-800 rounded-full">{{ skill.get_level_display }}</span>
+                    {% endif %}
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Projects Section -->
+        {% if projects %}
+        <div class="mb-10">
+            <h3 class="section-title text-xl">Projects</h3>
+            <div class="space-y-6">
+                {% for project in projects %}
+                <div class="rounded-lg bg-gray-50 p-5 transition-all duration-200 hover:shadow-md">
+                    <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-2">
+                        <h4 class="text-lg font-semibold text-gray-800">{{ project.title }}</h4>
                         {% if project.start_date %}
-                            <span class="text-sm text-gray-600">
-                                {{ project.start_date|date:"M Y" }}
-                                {% if project.end_date %} - {{ project.end_date|date:"M Y" }}{% endif %}
-                            </span>
+                        <span class="text-sm text-gray-600 font-medium">
+                            {{ project.start_date|date:"M Y" }}
+                            {% if project.end_date %} - {{ project.end_date|date:"M Y" }}{% endif %}
+                        </span>
                         {% endif %}
                     </div>
                     {% if project.description %}
-                        <p class="text-gray-600 mt-2">{{ project.description }}</p>
+                    <div class="mt-3 text-gray-600 prose prose-sm">
+                        {{ project.description|linebreaks }}
+                    </div>
                     {% endif %}
                     {% if project.technologies %}
-                        <p class="text-gray-600 mt-1">Technologies: {{ project.technologies }}</p>
+                    <div class="mt-2">
+                        <span class="text-sm font-medium text-gray-700">Technologies:</span>
+                        <span class="text-sm text-gray-600">{{ project.technologies }}</span>
+                    </div>
                     {% endif %}
                     {% if project.url %}
-                        <a href="{{ project.url }}" target="_blank" class="text-primary hover:underline mt-2 inline-block">View Project</a>
+                    <div class="mt-3">
+                        <a href="{{ project.url }}" target="_blank" class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                            View Project
+                        </a>
+                    </div>
                     {% endif %}
                 </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
         </div>
-    {% endif %}
-    
-    {% if certifications %}
-        <div class="mb-8">
-            <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-3">Certifications</h3>
-            {% for certification in certifications %}
-                <div class="mb-6">
-                    <div class="flex justify-between">
-                        <h4 class="text-md font-semibold text-gray-800">{{ certification.name }}</h4>
-                        <span class="text-sm text-gray-600">
-                            Issued: {{ certification.date_issued|date:"M Y" }}
-                            {% if certification.expiration_date %}
-                                - Expires: {{ certification.expiration_date|date:"M Y" }}
-                            {% endif %}
-                        </span>
+        {% endif %}
+        
+        <!-- Certifications Section -->
+        {% if certifications %}
+        <div class="mb-10">
+            <h3 class="section-title text-xl">Certifications</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% for certification in certifications %}
+                <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-all duration-200">
+                    <div class="flex justify-between items-start">
+                        <h4 class="text-lg font-semibold text-gray-800">{{ certification.name }}</h4>
+                        <div class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                            {{ certification.date_issued|date:"M Y" }}
+                        </div>
                     </div>
-                    <p class="text-gray-700">{{ certification.issuer }}</p>
+                    <p class="text-gray-700 mt-1">{{ certification.issuer }}</p>
                     {% if certification.credential_id %}
-                        <p class="text-gray-600 mt-1">Credential ID: {{ certification.credential_id }}</p>
+                    <p class="text-gray-600 mt-2 text-sm">
+                        <span class="font-medium">Credential ID:</span> {{ certification.credential_id }}
+                    </p>
                     {% endif %}
                     {% if certification.credential_url %}
-                        <a href="{{ certification.credential_url }}" target="_blank" class="text-primary hover:underline mt-1 inline-block">View Credential</a>
+                    <div class="mt-3">
+                        <a href="{{ certification.credential_url }}" target="_blank" class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                            Verify Credential
+                        </a>
+                    </div>
                     {% endif %}
                 </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
         </div>
-    {% endif %}
+        {% endif %}
+        
+        <!-- Languages Section -->
+        {% if languages %}
+        <div class="mb-10">
+            <h3 class="section-title text-xl">Languages</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% for language in languages %}
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-lg font-semibold text-gray-800">{{ language.language }}</h4>
+                        <div class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                            {{ language.get_proficiency_display }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- References Section (if enabled) -->
+        {% if references and resume.show_references %}
+        <div class="mb-6">
+            <h3 class="section-title text-xl">References</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for reference in references %}
+                <div class="border border-gray-200 rounded-lg p-5 hover:border-blue-300 transition-all duration-200">
+                    <h4 class="text-lg font-semibold text-gray-800">{{ reference.name }}</h4>
+                    <p class="text-gray-700 mt-1">{{ reference.position }}{% if reference.company %}, {{ reference.company }}{% endif %}</p>
+                    
+                    <div class="mt-3 space-y-1">
+                        {% if reference.email %}
+                        <div class="flex items-center text-sm text-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            {{ reference.email }}
+                        </div>
+                        {% endif %}
+                        {% if reference.phone %}
+                        <div class="flex items-center text-sm text-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                            {{ reference.phone }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if reference.description %}
+                    <div class="mt-4 text-gray-600 prose prose-sm">
+                        <p class="italic">"{{ reference.description }}"</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Awards Section -->
+        {% if awards %}
+        <div class="mb-10">
+            <h3 class="section-title text-xl">Awards & Recognition</h3>
+            <div class="space-y-4">
+                {% for award in awards %}
+                <div class="timeline-item pb-6">
+                    <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-2">
+                        <h4 class="text-lg font-semibold text-gray-800">{{ award.title }}</h4>
+                        <span class="text-sm text-gray-600 font-medium bg-blue-50 px-3 py-1 rounded-full">
+                            {{ award.date|date:"M Y" }}
+                        </span>
+                    </div>
+                    <p class="text-gray-700 font-medium">{{ award.issuer }}</p>
+                    {% if award.description %}
+                    <div class="mt-2 text-gray-600 prose prose-sm">
+                        {{ award.description|linebreaks }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Custom Sections -->
+        {% for section in custom_sections %}
+        <div class="mb-10">
+            <h3 class="section-title text-xl">{{ section.title }}</h3>
+            <div class="text-gray-700 prose prose-sm">
+                {{ section.content|linebreaks }}
+            </div>
+        </div>
+        {% endfor %}
+        
+    </div>
     
+    <!-- Floating Resume Actions -->
     {% if is_owner %}
-        <div class="flex justify-between mt-8">
-            <a href="{% url 'edit_resume' resume.slug %}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                Edit Resume
-            </a>
-            
-            <a href="{% url 'export_pdf_resume' resume.slug %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                Export as PDF
-            </a>
-        </div>
+    <div class="resume-toolbar fixed bottom-6 left-1/2 transform -translate-x-1/2 py-3 px-6 rounded-full shadow-lg z-50 flex items-center space-x-4">
+        <a href="{% url 'edit_resume' resume.slug %}" class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-700 bg-white rounded-full hover:bg-blue-50 focus:outline-none transition-all duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            Edit
+        </a>
+        <a href="{% url 'export_pdf_resume' resume.slug %}" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-full hover:bg-blue-800 focus:outline-none transition-all duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            PDF
+        </a>
+        <button onclick="window.print()" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-full hover:bg-gray-200 focus:outline-none transition-all duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            Print
+        </button>
+    </div>
     {% endif %}
 </div>
 {% endblock %}
