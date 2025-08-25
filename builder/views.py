@@ -439,8 +439,11 @@ def view_resume(request, slug):
     if resume.user_profile.user != request.user and resume.status != 'published':
         raise Http404("Resume not found")
     
+    # Check if the user is the owner
+    is_owner = resume.user_profile.user == request.user
+    
     # Log view for analytics if not the owner
-    if resume.user_profile.user != request.user:
+    if not is_owner:
         analytics, created = ResumeAnalytics.objects.get_or_create(resume=resume)
         analytics.log_view()
     
@@ -459,6 +462,7 @@ def view_resume(request, slug):
         'skills': skills,
         'projects': projects,
         'certifications': certifications,
+        'is_owner': is_owner,
     }
     
     return render(request, 'builder/view_resume.html', context)
@@ -526,3 +530,22 @@ def edit_profile(request):
         return redirect('dashboard')
     
     return render(request, 'builder/edit_profile.html', {'profile': profile})
+
+def template_samples(request):
+    """Display sample resume templates to users"""
+    templates = ResumeTemplate.objects.all()
+    
+    # Group templates by category
+    templates_by_category = {
+        'modern': templates.filter(category='modern'),
+        'minimal': templates.filter(category='minimal'),
+        'creative': templates.filter(category='creative'),
+        'executive': templates.filter(category='executive')
+    }
+    
+    context = {
+        'templates': templates,
+        'templates_by_category': templates_by_category
+    }
+    
+    return render(request, 'builder/samples.html', context)

@@ -28,13 +28,13 @@
         {% endif %}
     </div>
     
-    {% if resume.experiences.exists %}
+    {% if experiences %}
         <div class="mb-8">
             <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-3">Work Experience</h3>
-            {% for experience in resume.experiences.all %}
+            {% for experience in experiences %}
                 <div class="mb-6">
                     <div class="flex justify-between">
-                        <h4 class="text-md font-semibold text-gray-800">{{ experience.job_title }}</h4>
+                        <h4 class="text-md font-semibold text-gray-800">{{ experience.position }}</h4>
                         <span class="text-sm text-gray-600">
                             {{ experience.start_date|date:"M Y" }} - 
                             {% if experience.current %}Present{% else %}{{ experience.end_date|date:"M Y" }}{% endif %}
@@ -49,22 +49,19 @@
         </div>
     {% endif %}
     
-    {% if resume.educations.exists %}
+    {% if educations %}
         <div class="mb-8">
             <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-3">Education</h3>
-            {% for education in resume.educations.all %}
+            {% for education in educations %}
                 <div class="mb-6">
                     <div class="flex justify-between">
-                        <h4 class="text-md font-semibold text-gray-800">{{ education.school }}</h4>
+                        <h4 class="text-md font-semibold text-gray-800">{{ education.institution }}</h4>
                         <span class="text-sm text-gray-600">
                             {{ education.start_date|date:"M Y" }} - 
-                            {% if education.current %}Present{% else %}{{ education.end_date|date:"M Y" }}{% endif %}
+                            {% if education.end_date %}{{ education.end_date|date:"M Y" }}{% else %}Present{% endif %}
                         </span>
                     </div>
-                    <p class="text-gray-700">{{ education.degree }} in {{ education.field_of_study }}</p>
-                    {% if education.gpa %}
-                        <p class="text-gray-600">GPA: {{ education.gpa }}</p>
-                    {% endif %}
+                    <p class="text-gray-700">{{ education.degree }}{% if education.field_of_study %} in {{ education.field_of_study }}{% endif %}</p>
                     {% if education.description %}
                         <p class="text-gray-600 mt-2">{{ education.description }}</p>
                     {% endif %}
@@ -73,11 +70,11 @@
         </div>
     {% endif %}
     
-    {% if resume.skills.exists %}
+    {% if skills %}
         <div class="mb-8">
             <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-3">Skills</h3>
             <div class="flex flex-wrap gap-2">
-                {% for skill in resume.skills.all %}
+                {% for skill in skills %}
                     <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
                         {{ skill.name }}
                         {% if skill.level %}
@@ -89,46 +86,49 @@
         </div>
     {% endif %}
     
-    {% if resume.projects.exists %}
+    {% if projects %}
         <div class="mb-8">
             <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-3">Projects</h3>
-            {% for project in resume.projects.all %}
+            {% for project in projects %}
                 <div class="mb-6">
                     <div class="flex justify-between">
                         <h4 class="text-md font-semibold text-gray-800">{{ project.title }}</h4>
                         {% if project.start_date %}
                             <span class="text-sm text-gray-600">
-                                {{ project.start_date|date:"M Y" }} - 
-                                {% if project.current %}Present{% else %}{{ project.end_date|date:"M Y" }}{% endif %}
+                                {{ project.start_date|date:"M Y" }}
+                                {% if project.end_date %} - {{ project.end_date|date:"M Y" }}{% endif %}
                             </span>
                         {% endif %}
                     </div>
                     {% if project.description %}
                         <p class="text-gray-600 mt-2">{{ project.description }}</p>
                     {% endif %}
-                    {% if project.link %}
-                        <a href="{{ project.link }}" target="_blank" class="text-primary hover:underline mt-2 inline-block">View Project</a>
+                    {% if project.technologies %}
+                        <p class="text-gray-600 mt-1">Technologies: {{ project.technologies }}</p>
+                    {% endif %}
+                    {% if project.url %}
+                        <a href="{{ project.url }}" target="_blank" class="text-primary hover:underline mt-2 inline-block">View Project</a>
                     {% endif %}
                 </div>
             {% endfor %}
         </div>
     {% endif %}
     
-    {% if resume.certifications.exists %}
+    {% if certifications %}
         <div class="mb-8">
             <h3 class="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2 mb-3">Certifications</h3>
-            {% for certification in resume.certifications.all %}
+            {% for certification in certifications %}
                 <div class="mb-6">
                     <div class="flex justify-between">
                         <h4 class="text-md font-semibold text-gray-800">{{ certification.name }}</h4>
                         <span class="text-sm text-gray-600">
-                            Issued: {{ certification.issue_date|date:"M Y" }}
+                            Issued: {{ certification.date_issued|date:"M Y" }}
                             {% if certification.expiration_date %}
                                 - Expires: {{ certification.expiration_date|date:"M Y" }}
                             {% endif %}
                         </span>
                     </div>
-                    <p class="text-gray-700">{{ certification.issuing_organization }}</p>
+                    <p class="text-gray-700">{{ certification.issuer }}</p>
                     {% if certification.credential_id %}
                         <p class="text-gray-600 mt-1">Credential ID: {{ certification.credential_id }}</p>
                     {% endif %}

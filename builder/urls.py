@@ -7,6 +7,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('profile/edit/', views.edit_profile, name='edit_profile'),
+    path('templates/samples/', views.template_samples, name='template_samples'),
     
     # Resume CRUD operations
     path('resume/create/', views.create_resume, name='create_resume'),

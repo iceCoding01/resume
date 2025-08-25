@@ -1,0 +1,432 @@
+{% extends "base.html" %}
+
+{% block head_title %}Resume Samples & Templates{% endblock %}
+
+{% block extra_css %}
+<style>
+    .template-card {
+        transition: all 0.2s ease;
+    }
+    
+    .template-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    .template-card img {
+        transition: all 0.3s ease;
+    }
+    
+    .template-card:hover img {
+        transform: scale(1.03);
+    }
+    
+    .sample-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 10;
+    }
+    
+    .modal {
+        transition: opacity 0.25s ease;
+    }
+    
+    body.modal-active {
+        overflow-x: hidden;
+        overflow-y: hidden !important;
+    }
+    
+    .modal-img {
+        max-height: calc(100vh - 200px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Hero Section -->
+    <div class="text-center mb-16">
+        <h1 class="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight">
+            <span class="block">Resume Templates & Samples</span>
+        </h1>
+        <p class="mt-5 max-w-xl mx-auto text-xl text-gray-500">
+            Browse our collection of professionally designed resume templates and see real-world examples.
+        </p>
+    </div>
+    
+    <!-- Filter & Search Section -->
+    <div class="mb-10 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+        <div class="flex space-x-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
+            <button class="filter-btn bg-primary text-white px-4 py-2 rounded-md text-sm font-medium flex-shrink-0" data-filter="all">All Templates</button>
+            <button class="filter-btn bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-md text-sm font-medium flex-shrink-0" data-filter="modern">Modern</button>
+            <button class="filter-btn bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-md text-sm font-medium flex-shrink-0" data-filter="creative">Creative</button>
+            <button class="filter-btn bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-md text-sm font-medium flex-shrink-0" data-filter="minimal">Minimal</button>
+            <button class="filter-btn bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-md text-sm font-medium flex-shrink-0" data-filter="executive">Executive</button>
+        </div>
+        
+        <div class="relative w-full md:w-64">
+            <input type="text" id="template-search" placeholder="Search templates..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                </svg>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Template Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for template in templates %}
+        <div class="template-card bg-white rounded-lg overflow-hidden shadow-md relative" 
+             data-category="{{ template.category }}" 
+             data-name="{{ template.name|lower }}">
+            {% if template.is_premium %}
+                <span class="sample-badge bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-full">Premium</span>
+            {% endif %}
+            
+            {% if template.category == 'modern' %}
+                <span class="sample-badge bg-primary text-white text-xs font-bold px-2 py-1 rounded-full">Modern</span>
+            {% elif template.category == 'creative' %}
+                <span class="sample-badge bg-purple-600 text-white text-xs font-bold px-2 py-1 rounded-full">Creative</span>
+            {% elif template.category == 'executive' %}
+                <span class="sample-badge bg-blue-800 text-white text-xs font-bold px-2 py-1 rounded-full">Executive</span>
+            {% elif template.category == 'minimal' %}
+                <span class="sample-badge bg-gray-600 text-white text-xs font-bold px-2 py-1 rounded-full">Minimal</span>
+            {% endif %}
+            
+            <div class="h-64 overflow-hidden">
+                {% if template.preview_image %}
+                    <img src="{{ template.preview_image }}" alt="{{ template.name }} Template" class="w-full h-full object-cover object-top">
+                {% else %}
+                    <img src="https://via.placeholder.com/400x550?text={{ template.name|urlencode }}" alt="{{ template.name }} Template" class="w-full h-full object-cover object-top">
+                {% endif %}
+            </div>
+            <div class="p-5">
+                <h3 class="text-lg font-bold text-gray-900">{{ template.name }}</h3>
+                <p class="text-gray-600 text-sm mt-1 mb-4">{{ template.description|truncatechars:100 }}</p>
+                <div class="flex space-x-2">
+                    <a href="{% url 'dashboard' %}?template={{ template.id }}" class="flex-1 bg-primary text-white text-center py-2 rounded-md text-sm font-medium hover:bg-blue-600 transition">Use Template</a>
+                    <button class="preview-btn flex items-center justify-center w-10 h-10 bg-gray-100 rounded-md hover:bg-gray-200 transition" 
+                       title="Preview {{ template.name }}"
+                       data-template-id="{{ template.id }}"
+                       data-template-name="{{ template.name }}"
+                       data-template-description="{{ template.description }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-3 py-8 text-center">
+            <p class="text-gray-500 text-lg">No templates found. Please check back soon!</p>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Real Examples Section -->
+    <div class="mt-20">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900">Real Resume Examples</h2>
+            <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-500">
+                See how these templates look with real content across different industries
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Marketing Example -->
+            <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition">
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="h-14 w-14 rounded-full bg-blue-100 flex items-center justify-center text-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-xl font-bold text-gray-900">Marketing Professional</h3>
+                            <p class="text-gray-600 text-sm">Modern Template</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">See how a marketing professional with 5+ years of experience presents their skills in digital marketing, campaign management, and analytics.</p>
+                    <a href="#" class="inline-flex items-center text-primary font-medium hover:text-blue-700">
+                        View Example
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Software Engineer Example -->
+            <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition">
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="h-14 w-14 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-xl font-bold text-gray-900">Software Engineer</h3>
+                            <p class="text-gray-600 text-sm">Technical Template</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">This example shows how a software engineer effectively showcases technical skills, project experience, and educational background.</p>
+                    <a href="#" class="inline-flex items-center text-primary font-medium hover:text-blue-700">
+                        View Example
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Healthcare Professional Example -->
+            <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition">
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="h-14 w-14 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-xl font-bold text-gray-900">Healthcare Professional</h3>
+                            <p class="text-gray-600 text-sm">Modern Template</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">A healthcare professional's resume highlighting clinical experience, patient care skills, and medical certifications.</p>
+                    <a href="#" class="inline-flex items-center text-primary font-medium hover:text-blue-700">
+                        View Example
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Financial Analyst Example -->
+            <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition">
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="h-14 w-14 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-xl font-bold text-gray-900">Financial Analyst</h3>
+                            <p class="text-gray-600 text-sm">Executive Template</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">This example demonstrates how a financial analyst can present their expertise in financial modeling, analysis, and investment strategies.</p>
+                    <a href="#" class="inline-flex items-center text-primary font-medium hover:text-blue-700">
+                        View Example
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- FAQ Section -->
+    <div class="mt-20 bg-gray-50 rounded-xl p-8">
+        <div class="text-center mb-10">
+            <h2 class="text-3xl font-bold text-gray-900">Frequently Asked Questions</h2>
+            <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-500">
+                Common questions about our resume templates and samples
+            </p>
+        </div>
+        
+        <div class="max-w-3xl mx-auto">
+            <div class="mb-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Can I customize these templates?</h3>
+                <p class="text-gray-600">Yes, all templates are fully customizable. You can change colors, fonts, sections, and layout to match your preferences and needs.</p>
+            </div>
+            
+            <div class="mb-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Are these templates ATS-friendly?</h3>
+                <p class="text-gray-600">Absolutely! All our templates are designed to be ATS (Applicant Tracking System) friendly, ensuring your resume gets past automated screening systems.</p>
+            </div>
+            
+            <div class="mb-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Can I download my resume in different formats?</h3>
+                <p class="text-gray-600">Yes, you can download your completed resume in PDF, DOCX, and plain text formats to suit different application requirements.</p>
+            </div>
+            
+            <div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Do I need to create an account to use these templates?</h3>
+                <p class="text-gray-600">While you can browse all templates without an account, you'll need to sign up to customize and save your resume. Don't worry - registration is free and takes less than a minute.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Call to Action -->
+    <div class="mt-16 text-center">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6">Ready to Create Your Professional Resume?</h2>
+        <a href="{% url 'dashboard' %}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-blue-700 transition">
+            Get Started Now
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+        </a>
+    </div>
+</div>
+
+<!-- Template Preview Modal -->
+<div id="template-preview-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden modal">
+    <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 overflow-hidden">
+        <div class="p-6 bg-gray-50 border-b flex justify-between items-center">
+            <h3 id="modal-title" class="text-xl font-bold text-gray-900">Template Preview</h3>
+            <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="p-6 flex flex-col md:flex-row gap-6">
+            <div class="w-full md:w-1/2 flex justify-center">
+                <img id="modal-image" src="" alt="Template Preview" class="rounded shadow-md modal-img object-contain">
+            </div>
+            <div class="w-full md:w-1/2">
+                <h4 id="modal-template-name" class="text-2xl font-bold text-gray-900 mb-4"></h4>
+                <p id="modal-description" class="text-gray-600 mb-6"></p>
+                <div>
+                    <h5 class="font-semibold text-gray-900 mb-2">Features:</h5>
+                    <ul class="list-disc pl-5 space-y-1 text-gray-600 mb-6">
+                        <li>Professional layout optimized for readability</li>
+                        <li>ATS-friendly design</li>
+                        <li>Customizable sections and colors</li>
+                        <li>Modern typography</li>
+                        <li>PDF and DOCX export</li>
+                    </ul>
+                </div>
+                <div class="mt-6">
+                    <a id="modal-use-template" href="#" class="inline-block w-full bg-primary text-white text-center py-3 px-4 rounded-md font-medium hover:bg-blue-700 transition">
+                        Use This Template
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for Template Filtering and Modal -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Filter functionality
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const templateCards = document.querySelectorAll('.template-card');
+        const searchInput = document.getElementById('template-search');
+        
+        // Preview modal elements
+        const modal = document.getElementById('template-preview-modal');
+        const closeModal = document.getElementById('close-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalImage = document.getElementById('modal-image');
+        const modalTemplateName = document.getElementById('modal-template-name');
+        const modalDescription = document.getElementById('modal-description');
+        const modalUseTemplate = document.getElementById('modal-use-template');
+        
+        // Filter buttons functionality
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                filterButtons.forEach(btn => {
+                    btn.classList.remove('bg-primary', 'text-white');
+                    btn.classList.add('bg-gray-100', 'text-gray-700');
+                });
+                
+                // Add active class to clicked button
+                this.classList.remove('bg-gray-100', 'text-gray-700');
+                this.classList.add('bg-primary', 'text-white');
+                
+                const filter = this.getAttribute('data-filter');
+                
+                // Filter template cards
+                templateCards.forEach(card => {
+                    if (filter === 'all' || card.getAttribute('data-category') === filter) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+        
+        // Search functionality
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            templateCards.forEach(card => {
+                const templateName = card.getAttribute('data-name');
+                
+                if (templateName.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+        
+        // Modal functionality
+        function showModal(templateId, templateName, description, imageUrl) {
+            // Set modal content
+            modalTitle.textContent = 'Template Preview: ' + templateName;
+            modalTemplateName.textContent = templateName;
+            modalDescription.textContent = description;
+            
+            if (imageUrl) {
+                modalImage.src = imageUrl;
+            } else {
+                modalImage.src = `https://via.placeholder.com/600x800?text=${encodeURIComponent(templateName)}`;
+            }
+            
+            // Set use template link
+            modalUseTemplate.href = `/dashboard/?template=${templateId}`;
+            
+            // Show modal
+            modal.classList.remove('hidden');
+            document.body.classList.add('modal-active');
+        }
+        
+        // Close modal when clicking close button
+        closeModal.addEventListener('click', function() {
+            modal.classList.add('hidden');
+            document.body.classList.remove('modal-active');
+        });
+        
+        // Close modal when clicking outside
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+                document.body.classList.remove('modal-active');
+            }
+        });
+        
+        // Open modal when clicking preview button
+        document.querySelectorAll('.preview-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const templateId = this.getAttribute('data-template-id');
+                const templateName = this.getAttribute('data-template-name');
+                const description = this.getAttribute('data-template-description');
+                const previewImage = this.closest('.template-card').querySelector('img').src;
+                
+                showModal(templateId, templateName, description, previewImage);
+            });
+        });
+        
+        // Function to initialize preview functionality for dynamically added elements
+        window.showTemplatePreview = function(templateName, description, imageUrl, templateId) {
+            showModal(templateId, templateName, description, imageUrl);
+        };
+    });
+</script>
+{% endblock %}

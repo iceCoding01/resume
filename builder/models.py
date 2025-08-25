@@ -101,8 +101,16 @@ class Certification(models.Model):
         return f"{self.name} by {self.issuer}"
 
 class ResumeTemplate(models.Model):
+    CATEGORY_CHOICES = (
+        ('modern', 'Modern'),
+        ('minimal', 'Minimal'),
+        ('creative', 'Creative'),
+        ('executive', 'Executive'),
+    )
+    
     name = models.CharField(max_length=50)
     description = models.TextField()
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='modern')
     preview_image = models.URLField(blank=True)
     is_premium = models.BooleanField(default=False)
     html_template = models.CharField(max_length=100, default='classic.html')
@@ -164,6 +172,16 @@ class ResumeAnalytics(models.Model):
     
     def get_metadata(self):
         return json.loads(self.metadata)
+    
+    def log_view(self):
+        """Log a view event for the resume"""
+        self.action = 'viewed'
+        self.save()
+    
+    def log_download(self):
+        """Log a PDF download event for the resume"""
+        self.action = 'pdf_generated'
+        self.save()
     
     def __str__(self):
         return f"{self.get_action_display()} - {self.resume.title} - {self.created_at.strftime('%Y-%m-%d %H:%M')}"

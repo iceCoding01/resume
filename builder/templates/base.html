@@ -12,29 +12,7 @@
                 extend: {
                     colors: {
                         primary: '#0ea5e9',
-                                    // Mobile menu toggle
-            const mobileMenuButton = document.getElementById('mobile-menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-            
-            if (mobileMenuButton && mobileMenu) {
-                console.log('Mobile menu components found');
-                mobileMenuButton.addEventListener('click', function() {
-                    console.log('Mobile menu button clicked');
-                    const expanded = this.getAttribute('aria-expanded') === 'true';
-                    this.setAttribute('aria-expanded', !expanded);
-                    
-                    if (expanded) {
-                        mobileMenu.classList.add('hidden');
-                    } else {
-                        mobileMenu.classList.remove('hidden');
-                    }
-                });
-            } else {
-                console.error('Mobile menu button or menu not found:', { 
-                    button: mobileMenuButton, 
-                    menu: mobileMenu 
-                });
-            }48b',
+                        secondary: '#64748b',
                         dark: '#0f172a',
                         light: '#f8fafc'
                     },
@@ -140,8 +118,8 @@
                         <a href="#features" class="text-base font-medium text-gray-600 hover:text-primary transition duration-150">Features</a>
                         
                         <!-- Templates dropdown -->
-                        <div class="relative" x-data="{ open: false }">
-                            <button type="button" class="flex items-center text-base font-medium text-gray-600 hover:text-primary transition duration-150 px-3 py-2 rounded hover:bg-gray-100" id="templates-menu-button" aria-expanded="false" aria-haspopup="true" onclick="toggleTemplatesDropdown()">
+                        <div class="relative">
+                            <button type="button" class="flex items-center text-base font-medium text-gray-600 hover:text-primary transition duration-150 px-3 py-2 rounded hover:bg-gray-100" id="templates-menu-button" aria-expanded="false" aria-haspopup="true">
                                 <span>Templates</span>
                                 <svg class="ml-1 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -204,7 +182,7 @@
                                 
                                 <!-- See all templates link -->
                                 <div class="col-span-2 mt-3 pt-3 border-t border-gray-100 text-center">
-                                    <a href="{% url 'dashboard' %}" class="text-sm font-medium text-primary hover:text-blue-700">
+                                    <a href="{% url 'template_samples' %}" class="text-sm font-medium text-primary hover:text-blue-700">
                                         View all templates →
                                     </a>
                                 </div>
@@ -318,7 +296,7 @@
                         <a href="{% url 'dashboard' %}?template=executive" class="block pl-6 pr-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-primary hover:bg-gray-50">
                             Executive
                         </a>
-                        <a href="{% url 'dashboard' %}" class="block pl-6 pr-3 py-2 rounded-md text-sm font-medium text-primary hover:text-blue-700">
+                        <a href="{% url 'template_samples' %}" class="block pl-6 pr-3 py-2 rounded-md text-sm font-medium text-primary hover:text-blue-700">
                             View all templates →
                         </a>
                     </div>
@@ -464,16 +442,18 @@
     {% block extra_js %}{% endblock %}
     
     <script>
-        // Mobile menu toggle
+        // Wait for the DOM to be fully loaded before attaching event listeners
         document.addEventListener('DOMContentLoaded', function() {
-            // Log initialization to help debug
             console.log('DOM fully loaded, initializing menus and dropdowns');
             
-            const mobileMenuButton = document.querySelector('button[aria-expanded]');
-            const mobileMenu = document.querySelector('.hidden.md\\:hidden');
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
             
             if (mobileMenuButton && mobileMenu) {
+                console.log('Mobile menu components found');
                 mobileMenuButton.addEventListener('click', function() {
+                    console.log('Mobile menu button clicked');
                     const expanded = this.getAttribute('aria-expanded') === 'true';
                     this.setAttribute('aria-expanded', !expanded);
                     
@@ -482,6 +462,11 @@
                     } else {
                         mobileMenu.classList.remove('hidden');
                     }
+                });
+            } else {
+                console.error('Mobile menu button or menu not found:', { 
+                    button: mobileMenuButton, 
+                    menu: mobileMenu 
                 });
             }
             
@@ -497,14 +482,8 @@
                     
                     if (expanded) {
                         userDropdown.classList.add('hidden');
-                        userDropdown.classList.remove('transform', 'scale-100', 'opacity-100');
-                        userDropdown.classList.add('scale-95', 'opacity-0');
                     } else {
                         userDropdown.classList.remove('hidden');
-                        // Force a reflow before adding the transitions
-                        void userDropdown.offsetWidth;
-                        userDropdown.classList.add('transform', 'scale-100', 'opacity-100');
-                        userDropdown.classList.remove('scale-95', 'opacity-0');
                     }
                 });
                 
@@ -515,81 +494,48 @@
                         userMenuButton.setAttribute('aria-expanded', 'false');
                     }
                 });
-                
-                // Add keyboard support for accessibility
-                userMenuButton.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        this.click();
-                    }
-                });
             }
             
-            // Templates dropdown toggle
+            // Templates dropdown - IMPORTANT FIX HERE!
             const templatesMenuButton = document.getElementById('templates-menu-button');
             const templatesDropdown = document.getElementById('templates-dropdown');
             
-            console.log('Templates menu button:', templatesMenuButton);
-            console.log('Templates dropdown:', templatesDropdown);
-            
             if (templatesMenuButton && templatesDropdown) {
-                console.log('Adding click event listener to templates menu button');
+                console.log('Templates dropdown components found');
+                
+                // Remove the onclick attribute from the button to avoid conflicts
+                templatesMenuButton.removeAttribute('onclick');
                 
                 templatesMenuButton.addEventListener('click', function(e) {
-                    console.log('Templates button clicked');
-                    e.stopPropagation(); // Prevent event bubbling
-                    e.preventDefault(); // Prevent any default action
+                    console.log('Templates menu button clicked');
+                    e.preventDefault();
+                    e.stopPropagation();
                     
-                    const expanded = this.getAttribute('aria-expanded') === 'true';
-                    console.log('Current expanded state:', expanded);
-                    
-                    this.setAttribute('aria-expanded', !expanded);
-                    
-                    if (expanded) {
+                    // Toggle dropdown visibility
+                    if (templatesDropdown.classList.contains('hidden')) {
+                        console.log('Showing templates dropdown');
+                        templatesDropdown.classList.remove('hidden');
+                        this.setAttribute('aria-expanded', 'true');
+                    } else {
                         console.log('Hiding templates dropdown');
                         templatesDropdown.classList.add('hidden');
-                    } else {
-                        console.log('Showing templates dropdown');
-                        // Close other dropdowns first
-                        if (userDropdown && !userDropdown.classList.contains('hidden')) {
-                            userDropdown.classList.add('hidden');
-                            userMenuButton.setAttribute('aria-expanded', 'false');
-                        }
-                        
-                        templatesDropdown.classList.remove('hidden');
+                        this.setAttribute('aria-expanded', 'false');
                     }
                 });
                 
                 // Close dropdown when clicking outside
                 document.addEventListener('click', function(event) {
-                    if (templatesMenuButton && templatesDropdown && 
-                        !templatesMenuButton.contains(event.target) && 
-                        !templatesDropdown.contains(event.target)) {
+                    if (!templatesMenuButton.contains(event.target) && !templatesDropdown.contains(event.target)) {
                         templatesDropdown.classList.add('hidden');
                         templatesMenuButton.setAttribute('aria-expanded', 'false');
                     }
                 });
-                
-                // Add keyboard support for accessibility
-                templatesMenuButton.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        this.click();
-                    }
-                });
             } else {
-                console.error('Could not find templates menu button or dropdown');
+                console.error('Templates dropdown components not found:', {
+                    button: templatesMenuButton,
+                    dropdown: templatesDropdown
+                });
             }
-            
-            // Close mobile menu when clicking outside
-            document.addEventListener('click', function(event) {
-                if (mobileMenu && !mobileMenu.classList.contains('hidden') && 
-                    !mobileMenu.contains(event.target) && 
-                    !mobileMenuButton.contains(event.target)) {
-                    mobileMenu.classList.add('hidden');
-                    mobileMenuButton.setAttribute('aria-expanded', 'false');
-                }
-            });
             
             // Smooth scroll for anchor links
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -603,36 +549,28 @@
                             targetElement.scrollIntoView({
                                 behavior: 'smooth'
                             });
-                            
-                            // Close mobile menu if open
-                            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
-                                mobileMenu.classList.add('hidden');
-                                mobileMenuButton.setAttribute('aria-expanded', 'false');
-                            }
                         }
                     }
                 });
             });
         });
         
-        // Simple direct function to toggle templates dropdown
+        // Backup function for templates dropdown toggle
         function toggleTemplatesDropdown() {
+            console.log('Backup toggle function called');
             const dropdown = document.getElementById('templates-dropdown');
-            if (dropdown.classList.contains('hidden')) {
-                dropdown.classList.remove('hidden');
-                
-                // Add a one-time event listener to close when clicking outside
-                setTimeout(() => {
-                    document.addEventListener('click', function closeDropdown(event) {
-                        const button = document.getElementById('templates-menu-button');
-                        if (!dropdown.contains(event.target) && !button.contains(event.target)) {
-                            dropdown.classList.add('hidden');
-                            document.removeEventListener('click', closeDropdown);
-                        }
-                    });
-                }, 0);
+            const button = document.getElementById('templates-menu-button');
+            
+            if (dropdown) {
+                if (dropdown.classList.contains('hidden')) {
+                    dropdown.classList.remove('hidden');
+                    if (button) button.setAttribute('aria-expanded', 'true');
+                } else {
+                    dropdown.classList.add('hidden');
+                    if (button) button.setAttribute('aria-expanded', 'false');
+                }
             } else {
-                dropdown.classList.add('hidden');
+                console.error('Templates dropdown not found in toggleTemplatesDropdown function');
             }
         }
     </script>
