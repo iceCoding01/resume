@@ -87,7 +87,11 @@ ROOT_URLCONF = 'resume.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-    'DIRS': [BASE_DIR / 'builder' / 'templates'],
+        'DIRS': [
+            BASE_DIR / 'builder' / 'templates',
+            # Make sure allauth templates can be overridden
+            BASE_DIR / 'builder' / 'templates' / 'allauth',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
