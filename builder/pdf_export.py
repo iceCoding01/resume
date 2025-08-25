@@ -22,7 +22,7 @@ def export_pdf_resume(request, slug):
     resume = get_object_or_404(Resume, slug=slug)
     
     # If not the owner and resume is not published, deny access
-    if resume.user != request.user and resume.status != 'published':
+    if (hasattr(resume, 'user_profile') and resume.user_profile.user != request.user) and resume.status != 'published':
         raise Http404("Resume not found")
     
     # Log download for analytics
