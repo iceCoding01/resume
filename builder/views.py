@@ -549,3 +549,52 @@ def template_samples(request):
     }
     
     return render(request, 'builder/samples.html', context)
+
+@login_required
+def customize_template(request, template_id):
+    """Allow users to customize a specific template and create a resume from it"""
+    profile, created = UserProfile.objects.get_or_create(
+        user=request.user,
+        defaults={
+            'full_name': request.user.get_full_name() or request.user.username,
+            'email': request.user.email
+        }
+    )
+    
+    # Get the requested template
+    template = get_object_or_404(ResumeTemplate, id=template_id)
+    
+    if request.method == 'POST':
+        # Create a new resume with the selected template
+        title = request.POST.get('title', f"My {template.name} Resume")
+        
+        # Create the resume
+        resume = Resume.objects.create(
+            user_profile=profile,
+            title=title,
+            template=template,
+            status='draft'
+        )
+        
+        # Create analytics record
+        ResumeAnalytics.objects.create(resume=resume)
+        
+        messages.success(request, f'Resume created with {template.name} template successfully')
+        return redirect('edit_resume', slug=resume.slug)
+    
+    # Get all templates for related templates section
+    templates = ResumeTemplate.objects.all()
+    
+    # Group templates by category
+    templates_by_category = {
+        'modern': templates.filter(category='modern'),
+        'minimal': templates.filter(category='minimal'),
+        'creative': templates.filter(category='creative'),
+        'executive': templates.filter(category='executive')
+    }
+    
+    return render(request, 'builder/customize_template.html', {
+        'profile': profile,
+        'template': template,
+        'templates_by_category': templates_by_category
+    })

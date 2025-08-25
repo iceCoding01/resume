@@ -106,7 +106,7 @@
                 <h3 class="text-lg font-bold text-gray-900">{{ template.name }}</h3>
                 <p class="text-gray-600 text-sm mt-1 mb-4">{{ template.description|truncatechars:100 }}</p>
                 <div class="flex space-x-2">
-                    <a href="{% url 'dashboard' %}?template={{ template.id }}" class="flex-1 bg-primary text-white text-center py-2 rounded-md text-sm font-medium hover:bg-blue-600 transition">Use Template</a>
+                    <a href="{% url 'customize_template' template.id %}" class="flex-1 bg-primary text-white text-center py-2 rounded-md text-sm font-medium hover:bg-blue-600 transition">Use Template</a>
                     <button class="preview-btn flex items-center justify-center w-10 h-10 bg-gray-100 rounded-md hover:bg-gray-200 transition" 
                        title="Preview {{ template.name }}"
                        data-template-id="{{ template.id }}"
@@ -390,7 +390,7 @@
             }
             
             // Set use template link
-            modalUseTemplate.href = `/dashboard/?template=${templateId}`;
+            modalUseTemplate.href = `/templates/${templateId}/customize/`;
             
             // Show modal
             modal.classList.remove('hidden');
