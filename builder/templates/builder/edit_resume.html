@@ -2,642 +2,1545 @@
 {% load static %}
 {% block extra_css %}
 <style>
+    /* Premium UI Variables */
+    :root {
+        --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        --primary-color: #2563eb;
+        --primary-hover: #1d4ed8;
+        --primary-light: rgba(37, 99, 235, 0.1);
+        --secondary-color: #0ea5e9;
+        --secondary-light: rgba(14, 165, 233, 0.1);
+        --surface-color: #ffffff;
+        --background-color: #f1f5f9;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-600: #475569;
+        --gray-700: #334155;
+        --gray-800: #1e293b;
+        --gray-900: #0f172a;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --danger-hover: #dc2626;
+        --border-radius-sm: 0.375rem;
+        --border-radius: 0.5rem;
+        --border-radius-md: 0.75rem;
+        --border-radius-lg: 1rem;
+        --border-radius-xl: 1.25rem;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        --shadow-focus: 0 0 0 3px rgba(37, 99, 235, 0.3);
+        --transition: all 0.2s ease;
+    }
+    
+    /* Global Styles */
+    body {
+        background-color: var(--background-color);
+        color: var(--gray-800);
+    }
+    
+    .page-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1.5rem;
+    }
+    
+    /* Header */
+    .resume-header {
+        background-color: var(--surface-color);
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--shadow);
+        padding: 1.5rem 2rem;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .resume-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 200px;
+        height: 100%;
+        background: var(--primary-gradient);
+        opacity: 0.05;
+        clip-path: polygon(100% 0, 0% 0, 100% 100%);
+    }
+    
+    .resume-header::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 200px;
+        height: 100%;
+        background: var(--primary-gradient);
+        opacity: 0.05;
+        clip-path: polygon(0 100%, 0 0, 100% 100%);
+    }
+    
+    .resume-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .resume-title-icon {
+        font-size: 1.75rem;
+        color: var(--primary-color);
+    }
+    
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.375rem 0.75rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border-radius: 9999px;
+    }
+    
+    .status-draft {
+        background-color: var(--gray-100);
+        color: var(--gray-700);
+        border: 1px solid var(--gray-200);
+    }
+    
+    .status-published {
+        background-color: rgba(16, 185, 129, 0.1);
+        color: #065f46;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    
+    /* Section Cards */
+    .section-card {
+        background-color: var(--surface-color);
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--shadow);
+        margin-bottom: 1.75rem;
+        overflow: hidden;
+        transition: var(--transition);
+        position: relative;
+        animation: fadeInUp 0.5s ease forwards;
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    
+    .section-card:hover {
+        box-shadow: var(--shadow-md);
+    }
+    
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .section-card:nth-child(1) { animation-delay: 0.1s; }
+    .section-card:nth-child(2) { animation-delay: 0.2s; }
+    .section-card:nth-child(3) { animation-delay: 0.3s; }
+    .section-card:nth-child(4) { animation-delay: 0.4s; }
+    .section-card:nth-child(5) { animation-delay: 0.5s; }
+    .section-card:nth-child(6) { animation-delay: 0.6s; }
+    
+    .section-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 6px;
+        height: 100%;
+        background: var(--primary-gradient);
+    }
+    
+    .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.25rem 1.75rem;
+        border-bottom: 1px solid var(--gray-100);
+        background: linear-gradient(to right, var(--gray-50), var(--surface-color));
+    }
+    
+    .section-title-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .section-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border-radius: var(--border-radius);
+        background: var(--primary-gradient);
+        color: white;
+        font-size: 1.25rem;
+        box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3);
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--gray-900);
+    }
+    
+    .section-subtitle {
+        font-size: 0.875rem;
+        color: var(--gray-500);
+        margin-top: 0.125rem;
+    }
+    
+    .section-content {
+        padding: 1.5rem 1.75rem;
+    }
+    
+    /* Item Cards */
+    .item-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .item-card {
+        border-radius: var(--border-radius);
+        background-color: var(--gray-50);
+        padding: 1.25rem;
+        transition: var(--transition);
+        border: 1px solid var(--gray-100);
+    }
+    
+    .item-card:hover {
+        background-color: #fafafa;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
+        border-color: var(--gray-200);
+    }
+    
+    .item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.75rem;
+    }
+    
+    .item-title-wrapper {
+        flex: 1;
+    }
+    
+    .item-title {
+        font-weight: 600;
+        font-size: 1.125rem;
+        color: var(--gray-900);
+        margin: 0;
+    }
+    
+    .item-subtitle {
+        color: var(--gray-600);
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    .item-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.75rem;
+        color: var(--gray-500);
+        margin-top: 0.25rem;
+    }
+    
+    .item-meta-icon {
+        font-size: 0.875rem;
+    }
+    
+    .item-date {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        background-color: var(--primary-light);
+        color: var(--primary-color);
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+    
+    .item-description {
+        color: var(--gray-600);
+        font-size: 0.875rem;
+        line-height: 1.5;
+        margin-top: 0.5rem;
+    }
+    
+    .item-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    /* Button Styles */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-weight: 500;
+        padding: 0.625rem 1.25rem;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+    }
+    
+    .btn-sm {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+    }
+    
+    .btn-icon {
+        padding: 0.5rem;
+        border-radius: 9999px;
+    }
+    
+    .btn-primary {
+        background: var(--primary-gradient);
+        color: white;
+        box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3);
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(37, 99, 235, 0.4);
+    }
+    
+    .btn-primary:active {
+        transform: translateY(0);
+    }
+    
+    .btn-secondary {
+        background-color: var(--surface-color);
+        color: var(--gray-700);
+        border: 1px solid var(--gray-200);
+    }
+    
+    .btn-secondary:hover {
+        background-color: var(--gray-50);
+        color: var(--gray-900);
+        border-color: var(--gray-300);
+    }
+    
+    .btn-edit {
+        color: var(--primary-color);
+        background-color: var(--primary-light);
+    }
+    
+    .btn-edit:hover {
+        background-color: rgba(37, 99, 235, 0.2);
+    }
+    
+    .btn-delete {
+        color: var(--danger-color);
+        background-color: rgba(239, 68, 68, 0.1);
+    }
+    
+    .btn-delete:hover {
+        background-color: rgba(239, 68, 68, 0.2);
+    }
+    
+    /* Skills */
+    .skills-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+    
+    .skill-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, var(--primary-light) 0%, rgba(14, 165, 233, 0.1) 100%);
+        color: var(--primary-color);
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: var(--transition);
+        border: 1px solid rgba(37, 99, 235, 0.2);
+    }
+    
+    .skill-tag:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.15) 0%, rgba(14, 165, 233, 0.15) 100%);
+    }
+    
+    .skill-level {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 0.125rem 0.375rem;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+    }
+    
+    .skill-remove {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        background-color: rgba(255, 255, 255, 0.5);
+        border-radius: 9999px;
+        color: var(--primary-color);
+        transition: var(--transition);
+        margin-left: 0.25rem;
+    }
+    
+    .skill-remove:hover {
+        background-color: white;
+        color: var(--danger-color);
+    }
+    
+    /* Empty States */
+    .empty-state {
+        text-align: center;
+        padding: 2.5rem 1.5rem;
+        background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+        border-radius: var(--border-radius);
+        border: 2px dashed var(--gray-200);
+    }
+    
+    .empty-icon {
+        font-size: 2.5rem;
+        color: var(--gray-400);
+        margin-bottom: 1rem;
+    }
+    
+    .empty-title {
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-description {
+        color: var(--gray-500);
+        font-size: 0.875rem;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+    
+    /* Form Styles */
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+    
+    .form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+        background-color: var(--surface-color);
+    }
+    
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: var(--shadow-focus);
+        outline: none;
+    }
+    
+    .form-help {
+        font-size: 0.75rem;
+        color: var(--gray-500);
+        margin-top: 0.375rem;
+    }
+    
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .form-check-input {
+        width: 1rem;
+        height: 1rem;
+        border-radius: 0.25rem;
+        border: 1px solid var(--gray-300);
+        appearance: none;
+        background-color: var(--surface-color);
+        transition: var(--transition);
+        position: relative;
+        cursor: pointer;
+    }
+    
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .form-check-input:checked::after {
+        content: '✓';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 0.75rem;
+    }
+    
+    .form-check-label {
+        font-size: 0.875rem;
+        color: var(--gray-700);
+        cursor: pointer;
+    }
+    
+    /* Modal Styles */
     .modal {
         display: none;
         position: fixed;
-        z-index: 50;
+        z-index: 1000;
         left: 0;
         top: 0;
         width: 100%;
         height: 100%;
         overflow: auto;
-        background-color: rgba(0,0,0,0.4);
+        background-color: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(8px);
+        animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
     }
     
     .modal-content {
-        background-color: #fefefe;
-        margin: 10% auto;
-        padding: 20px;
-        border-radius: 0.5rem;
-        width: 80%;
-        max-width: 600px;
+        background-color: var(--surface-color);
+        margin: 5% auto;
+        width: 90%;
+        max-width: 650px;
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+        transform: translateY(20px);
+        animation: slideUp 0.3s ease forwards;
+    }
+    
+    @keyframes slideUp {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .modal-header {
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        border-bottom: 1px solid var(--gray-100);
+        background: linear-gradient(to right, var(--gray-50), var(--surface-color));
+    }
+    
+    .modal-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border-radius: var(--border-radius);
+        background: var(--primary-gradient);
+        color: white;
+        font-size: 1.5rem;
+        box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3);
+    }
+    
+    .modal-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--gray-900);
+        margin: 0;
+    }
+    
+    .modal-subtitle {
+        font-size: 0.875rem;
+        color: var(--gray-500);
+        margin-top: 0.25rem;
+    }
+    
+    .modal-body {
+        padding: 1.5rem;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+    
+    .modal-footer {
+        padding: 1rem 1.5rem;
+        background-color: var(--gray-50);
+        border-top: 1px solid var(--gray-100);
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
     }
     
     .close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
+        position: absolute;
+        top: 1.25rem;
+        right: 1.25rem;
+        width: 2rem;
+        height: 2rem;
+        background-color: var(--gray-100);
+        border-radius: 9999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--gray-500);
+        cursor: pointer;
+        transition: var(--transition);
+        font-size: 1.25rem;
+        border: none;
     }
     
-    .close:hover,
-    .close:focus {
-        color: black;
-        text-decoration: none;
+    .close:hover {
+        background-color: var(--gray-200);
+        color: var(--gray-900);
+        transform: rotate(90deg);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        
+        .item-header {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .item-date {
+            align-self: flex-start;
+        }
+        
+        .modal-content {
+            width: 95%;
+            margin: 10% auto;
+        }
+    }
+    
+    /* Additional Animations */
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
+        }
+        70% {
+            box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+        }
+    }
+    
+    /* Floating Action Button */
+    .floating-action-btn {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        width: 3.5rem;
+        height: 3.5rem;
+        border-radius: 9999px;
+        background: var(--primary-gradient);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.5);
         cursor: pointer;
+        transition: var(--transition);
+        z-index: 90;
+    }
+    
+    .floating-action-btn:hover {
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0 6px 15px rgba(37, 99, 235, 0.6);
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="bg-white shadow rounded-lg p-6 mb-8">
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">Edit Resume: {{ resume.title }}</h1>
-        <div>
-            <a href="{% url 'view_resume' resume.slug %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-                Preview
-            </a>
+<div class="page-container">
+    <!-- Resume Header -->
+    <div class="resume-header">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="resume-title">
+                    <i class="fas fa-file-alt resume-title-icon"></i>
+                    {{ resume.title }}
+                </h1>
+                <div class="flex items-center gap-2 mt-2">
+                    <span class="status-badge {% if resume.status == 'draft' %}status-draft{% else %}status-published{% endif %}">
+                        <i class="fas {% if resume.status == 'draft' %}fa-pencil-alt{% else %}fa-check-circle{% endif %}"></i>
+                        {{ resume.status|title }}
+                    </span>
+                    <span class="text-sm text-gray-500">Last updated: {{ resume.updated_at|date:"M d, Y" }}</span>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <a href="{% url 'view_resume' resume.slug %}" class="btn btn-secondary">
+                    <i class="fas fa-eye mr-2"></i>
+                    Preview Resume
+                </a>
+                <button id="exportPdfButton" onclick="generateResumePdf('{{ resume.slug }}')" class="btn btn-primary">
+                    <i class="fas fa-file-pdf mr-2"></i>
+                    <svg id="pdfSpinner" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Export PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Basic Information Section -->
+    <div class="section-card">
+        <div class="section-header">
+            <div class="section-title-wrapper">
+                <div class="section-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div>
+                    <h2 class="section-title">Basic Information</h2>
+                    <p class="section-subtitle">Edit your resume title and status</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section-content">
+            <form method="post" action="{% url 'edit_resume' resume.slug %}">
+                {% csrf_token %}
+                <input type="hidden" name="section" value="resume">
+                <input type="hidden" name="action" value="edit">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="form-group">
+                        <label for="title" class="form-label">Resume Title</label>
+                        <input type="text" name="title" id="title" value="{{ resume.title }}" class="form-control">
+                        <p class="form-help">Give your resume a descriptive name to easily identify it</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="status" class="form-label">Status</label>
+                        <select name="status" id="status" class="form-control">
+                            <option value="draft" {% if resume.status == 'draft' %}selected{% endif %}>Draft</option>
+                            <option value="published" {% if resume.status == 'published' %}selected{% endif %}>Published</option>
+                        </select>
+                        <p class="form-help">Published resumes are visible to anyone with the link</p>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save mr-2"></i>
+                        Save Changes
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
     
-    <div class="mb-8">
-        <h2 class="text-lg font-medium text-gray-900 mb-4">Basic Information</h2>
-        <form method="post" action="{% url 'edit_resume' resume.slug %}" class="space-y-4">
-            {% csrf_token %}
-            <input type="hidden" name="section" value="resume">
-            <input type="hidden" name="action" value="edit">
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Resume Title</label>
-                    <input type="text" name="title" id="title" value="{{ resume.title }}" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
-                </div>
-                
-                <div>
-                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                    <select name="status" id="status" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
-                        <option value="draft" {% if resume.status == 'draft' %}selected{% endif %}>Draft</option>
-                        <option value="published" {% if resume.status == 'published' %}selected{% endif %}>Published</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="flex justify-end">
-                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                    Save Changes
-                </button>
-            </div>
-        </form>
-    </div>
-    
     <!-- Education Section -->
-    <div class="mb-8">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-medium text-gray-900">Education</h2>
-            <button type="button" onclick="openModal('educationModal')" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                <svg xmlns="http://www.w3.org/2000/svg" class="-ml-0.5 mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
+    <div class="section-card">
+        <div class="section-header">
+            <div class="section-title-wrapper">
+                <div class="section-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <h2 class="section-title">Education</h2>
+                    <p class="section-subtitle">Add your academic background and qualifications</p>
+                </div>
+            </div>
+            <button type="button" onclick="openModal('educationModal')" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus mr-2"></i>
                 Add Education
             </button>
         </div>
         
-        {% if educations %}
-            <div class="bg-gray-50 rounded-lg divide-y divide-gray-200">
-                {% for education in educations %}
-                    <div class="p-4 hover:bg-gray-100">
-                        <div class="flex justify-between">
-                            <div>
-                                <h3 class="text-md font-medium text-gray-900">{{ education.degree }} {% if education.field_of_study %}in {{ education.field_of_study }}{% endif %}</h3>
-                                <p class="text-sm text-gray-500">{{ education.institution }}</p>
-                                <p class="text-sm text-gray-500">
-                                    {{ education.start_date|date:"M Y" }} - 
-                                    {% if not education.end_date %}Present{% else %}{{ education.end_date|date:"M Y" }}{% endif %}
-                                </p>
-                            </div>
-                            <div class="flex space-x-2">
-                                <button type="button" onclick="editEducation('{{ education.id }}')" class="text-blue-600 hover:text-blue-800">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                </button>
-                                <form method="post" action="{% url 'edit_resume' resume.slug %}" class="inline" onsubmit="return confirm('Are you sure you want to delete this education entry?');">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="section" value="education">
-                                    <input type="hidden" name="action" value="delete">
-                                    <input type="hidden" name="id" value="{{ education.id }}">
-                                    <button type="submit" class="text-red-600 hover:text-red-800">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
+        <div class="section-content">
+            {% if educations %}
+                <div class="item-list">
+                    {% for education in educations %}
+                        <div class="item-card">
+                            <div class="item-header">
+                                <div class="item-title-wrapper">
+                                    <h3 class="item-title">{{ education.degree }} {% if education.field_of_study %}in {{ education.field_of_study }}{% endif %}</h3>
+                                    <p class="item-subtitle">{{ education.institution }}</p>
+                                    <div class="item-meta">
+                                        <i class="fas fa-calendar-alt item-meta-icon mr-1"></i>
+                                        {{ education.start_date|date:"M Y" }} - 
+                                        {% if not education.end_date %}Present{% else %}{{ education.end_date|date:"M Y" }}{% endif %}
+                                    </div>
+                                </div>
+                                <div class="item-actions">
+                                    <button type="button" onclick="editEducation('{{ education.id }}')" class="btn btn-icon btn-edit">
+                                        <i class="fas fa-pencil-alt"></i>
                                     </button>
-                                </form>
+                                    <form method="post" action="{% url 'edit_resume' resume.slug %}" class="inline" onsubmit="return confirm('Are you sure you want to delete this education entry?');">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="section" value="education">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id" value="{{ education.id }}">
+                                        <button type="submit" class="btn btn-icon btn-delete">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
+                            {% if education.description %}
+                                <div class="item-description">
+                                    {{ education.description }}
+                                </div>
+                            {% endif %}
                         </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="text-center py-4 bg-gray-50 rounded-lg">
-                <p class="text-gray-500">No education entries yet. Click 'Add Education' to get started.</p>
-            </div>
-        {% endif %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-graduation-cap empty-icon"></i>
+                    <h3 class="empty-title">No Education Entries Yet</h3>
+                    <p class="empty-description">Add your degrees, diplomas, and educational background to enhance your resume</p>
+                    <button type="button" onclick="openModal('educationModal')" class="btn btn-primary mt-4">
+                        <i class="fas fa-plus mr-2"></i>
+                        Add Education
+                    </button>
+                </div>
+            {% endif %}
+        </div>
     </div>
     
     <!-- Experience Section -->
-    <div class="mb-8">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-medium text-gray-900">Work Experience</h2>
-            <button type="button" onclick="openModal('experienceModal')" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                <svg xmlns="http://www.w3.org/2000/svg" class="-ml-0.5 mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
+    <div class="section-card">
+        <div class="section-header">
+            <div class="section-title-wrapper">
+                <div class="section-icon">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <div>
+                    <h2 class="section-title">Work Experience</h2>
+                    <p class="section-subtitle">Add your professional experience and job history</p>
+                </div>
+            </div>
+            <button type="button" onclick="openModal('experienceModal')" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus mr-2"></i>
                 Add Experience
             </button>
         </div>
         
-        {% if experiences %}
-            <div class="bg-gray-50 rounded-lg divide-y divide-gray-200">
-                {% for experience in experiences %}
-                    <div class="p-4 hover:bg-gray-100">
-                        <div class="flex justify-between">
-                            <div>
-                                <h3 class="text-md font-medium text-gray-900">{{ experience.position }}</h3>
-                                <p class="text-sm text-gray-500">{{ experience.company }}{% if experience.location %}, {{ experience.location }}{% endif %}</p>
-                                <p class="text-sm text-gray-500">
-                                    {{ experience.start_date|date:"M Y" }} - 
-                                    {% if experience.current %}Present{% else %}{{ experience.end_date|date:"M Y" }}{% endif %}
-                                </p>
-                            </div>
-                            <div class="flex space-x-2">
-                                <button type="button" onclick="editExperience('{{ experience.id }}')" class="text-blue-600 hover:text-blue-800">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                </button>
-                                <form method="post" action="{% url 'edit_resume' resume.slug %}" class="inline" onsubmit="return confirm('Are you sure you want to delete this experience entry?');">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="section" value="experience">
-                                    <input type="hidden" name="action" value="delete">
-                                    <input type="hidden" name="id" value="{{ experience.id }}">
-                                    <button type="submit" class="text-red-600 hover:text-red-800">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
+        <div class="section-content">
+            {% if experiences %}
+                <div class="item-list">
+                    {% for experience in experiences %}
+                        <div class="item-card">
+                            <div class="item-header">
+                                <div class="item-title-wrapper">
+                                    <h3 class="item-title">{{ experience.position }}</h3>
+                                    <p class="item-subtitle">{{ experience.company }}{% if experience.location %}, {{ experience.location }}{% endif %}</p>
+                                    <div class="item-meta">
+                                        <i class="fas fa-calendar-alt item-meta-icon mr-1"></i>
+                                        {{ experience.start_date|date:"M Y" }} - 
+                                        {% if experience.current %}
+                                            <span class="font-medium text-green-600">Present</span>
+                                        {% else %}
+                                            {{ experience.end_date|date:"M Y" }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="item-actions">
+                                    <button type="button" onclick="editExperience('{{ experience.id }}')" class="btn btn-icon btn-edit">
+                                        <i class="fas fa-pencil-alt"></i>
                                     </button>
-                                </form>
+                                    <form method="post" action="{% url 'edit_resume' resume.slug %}" class="inline" onsubmit="return confirm('Are you sure you want to delete this experience entry?');">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="section" value="experience">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id" value="{{ experience.id }}">
+                                        <button type="submit" class="btn btn-icon btn-delete">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
+                            {% if experience.description %}
+                                <div class="item-description">
+                                    {{ experience.description }}
+                                </div>
+                            {% endif %}
                         </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="text-center py-4 bg-gray-50 rounded-lg">
-                <p class="text-gray-500">No experience entries yet. Click 'Add Experience' to get started.</p>
-            </div>
-        {% endif %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-briefcase empty-icon"></i>
+                    <h3 class="empty-title">No Work Experience Yet</h3>
+                    <p class="empty-description">Add your professional experience to showcase your career achievements</p>
+                    <button type="button" onclick="openModal('experienceModal')" class="btn btn-primary mt-4">
+                        <i class="fas fa-plus mr-2"></i>
+                        Add Experience
+                    </button>
+                </div>
+            {% endif %}
+        </div>
     </div>
     
     <!-- Skills Section -->
-    <div class="mb-8">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-medium text-gray-900">Skills</h2>
-            <button type="button" onclick="openModal('skillModal')" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                <svg xmlns="http://www.w3.org/2000/svg" class="-ml-0.5 mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
+    <div class="section-card">
+        <div class="section-header">
+            <div class="section-title-wrapper">
+                <div class="section-icon">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <div>
+                    <h2 class="section-title">Skills</h2>
+                    <p class="section-subtitle">Highlight your professional skills and expertise</p>
+                </div>
+            </div>
+            <button type="button" onclick="openModal('skillModal')" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus mr-2"></i>
                 Add Skill
             </button>
         </div>
         
-        {% if skills %}
-            <div class="flex flex-wrap gap-2">
-                {% for skill in skills %}
-                    <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                        {{ skill.name }}
-                        {% if skill.level %}
-                            <span class="ml-1 text-xs text-blue-600">({{ skill.level }})</span>
-                        {% endif %}
-                        <form method="post" action="{% url 'edit_resume' resume.slug %}" class="inline ml-1.5">
-                            {% csrf_token %}
-                            <input type="hidden" name="section" value="skill">
-                            <input type="hidden" name="action" value="delete">
-                            <input type="hidden" name="id" value="{{ skill.id }}">
-                            <button type="submit" class="text-blue-600 hover:text-blue-800">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </form>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="text-center py-4 bg-gray-50 rounded-lg">
-                <p class="text-gray-500">No skills added yet. Click 'Add Skill' to get started.</p>
-            </div>
-        {% endif %}
+        <div class="section-content">
+            {% if skills %}
+                <div class="skills-container">
+                    {% for skill in skills %}
+                        <div class="skill-tag">
+                            <i class="fas fa-check-circle mr-1"></i>
+                            {{ skill.name }}
+                            {% if skill.level %}
+                                <span class="skill-level">{{ skill.level }}</span>
+                            {% endif %}
+                            <form method="post" action="{% url 'edit_resume' resume.slug %}" class="inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="section" value="skill">
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="id" value="{{ skill.id }}">
+                                <button type="submit" class="skill-remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-tools empty-icon"></i>
+                    <h3 class="empty-title">No Skills Added Yet</h3>
+                    <p class="empty-description">Showcase your technical and soft skills to stand out to employers</p>
+                    <button type="button" onclick="openModal('skillModal')" class="btn btn-primary mt-4">
+                        <i class="fas fa-plus mr-2"></i>
+                        Add Skill
+                    </button>
+                </div>
+            {% endif %}
+        </div>
     </div>
     
     <!-- Projects Section -->
-    <div class="mb-8">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-medium text-gray-900">Projects</h2>
-            <button type="button" onclick="openModal('projectModal')" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                <svg xmlns="http://www.w3.org/2000/svg" class="-ml-0.5 mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
+    <div class="section-card">
+        <div class="section-header">
+            <div class="section-title-wrapper">
+                <div class="section-icon">
+                    <i class="fas fa-code-branch"></i>
+                </div>
+                <div>
+                    <h2 class="section-title">Projects</h2>
+                    <p class="section-subtitle">Showcase your relevant projects and accomplishments</p>
+                </div>
+            </div>
+            <button type="button" onclick="openModal('projectModal')" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus mr-2"></i>
                 Add Project
             </button>
         </div>
         
-        {% if projects %}
-            <div class="bg-gray-50 rounded-lg divide-y divide-gray-200">
-                {% for project in projects %}
-                    <div class="p-4 hover:bg-gray-100">
-                        <div class="flex justify-between">
-                            <div>
-                                <h3 class="text-md font-medium text-gray-900">{{ project.title }}</h3>
-                                {% if project.start_date %}
-                                    <p class="text-sm text-gray-500">
-                                        {{ project.start_date|date:"M Y" }}
-                                        {% if project.end_date %} - {{ project.end_date|date:"M Y" }}{% endif %}
-                                    </p>
-                                {% endif %}
-                                {% if project.description %}
-                                    <p class="text-sm text-gray-600 mt-1">{{ project.description|truncatechars:100 }}</p>
-                                {% endif %}
-                                {% if project.url %}
-                                    <a href="{{ project.url }}" target="_blank" class="text-sm text-primary hover:underline mt-1 inline-block">View Project</a>
-                                {% endif %}
-                            </div>
-                            <div class="flex space-x-2">
-                                <button type="button" onclick="editProject('{{ project.id }}')" class="text-blue-600 hover:text-blue-800">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                </button>
-                                <form method="post" action="{% url 'edit_resume' resume.slug %}" class="inline" onsubmit="return confirm('Are you sure you want to delete this project?');">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="section" value="project">
-                                    <input type="hidden" name="action" value="delete">
-                                    <input type="hidden" name="id" value="{{ project.id }}">
-                                    <button type="submit" class="text-red-600 hover:text-red-800">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
+        <div class="section-content">
+            {% if projects %}
+                <div class="item-list">
+                    {% for project in projects %}
+                        <div class="item-card">
+                            <div class="item-header">
+                                <div class="item-title-wrapper">
+                                    <h3 class="item-title">{{ project.title }}</h3>
+                                    {% if project.technologies %}
+                                        <p class="item-subtitle">{{ project.technologies }}</p>
+                                    {% endif %}
+                                    {% if project.start_date %}
+                                        <div class="item-meta">
+                                            <i class="fas fa-calendar-alt item-meta-icon mr-1"></i>
+                                            {{ project.start_date|date:"M Y" }}
+                                            {% if project.end_date %} - {{ project.end_date|date:"M Y" }}{% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="item-actions">
+                                    <button type="button" onclick="editProject('{{ project.id }}')" class="btn btn-icon btn-edit">
+                                        <i class="fas fa-pencil-alt"></i>
                                     </button>
-                                </form>
+                                    <form method="post" action="{% url 'edit_resume' resume.slug %}" class="inline" onsubmit="return confirm('Are you sure you want to delete this project?');">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="section" value="project">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id" value="{{ project.id }}">
+                                        <button type="submit" class="btn btn-icon btn-delete">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
+                            {% if project.description %}
+                                <div class="item-description">
+                                    {{ project.description|truncatechars:150 }}
+                                </div>
+                            {% endif %}
+                            {% if project.url %}
+                                <div class="mt-3">
+                                    <a href="{{ project.url }}" target="_blank" class="inline-flex items-center text-primary hover:underline">
+                                        <i class="fas fa-external-link-alt mr-1"></i>
+                                        View Project
+                                    </a>
+                                </div>
+                            {% endif %}
                         </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="text-center py-4 bg-gray-50 rounded-lg">
-                <p class="text-gray-500">No projects added yet. Click 'Add Project' to get started.</p>
-            </div>
-        {% endif %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-code-branch empty-icon"></i>
+                    <h3 class="empty-title">No Projects Added Yet</h3>
+                    <p class="empty-description">Show off your work with personal or professional projects you've completed</p>
+                    <button type="button" onclick="openModal('projectModal')" class="btn btn-primary mt-4">
+                        <i class="fas fa-plus mr-2"></i>
+                        Add Project
+                    </button>
+                </div>
+            {% endif %}
+        </div>
     </div>
     
     <!-- Certifications Section -->
-    <div class="mb-8">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-medium text-gray-900">Certifications</h2>
-            <button type="button" onclick="openModal('certificationModal')" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                <svg xmlns="http://www.w3.org/2000/svg" class="-ml-0.5 mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
+    <div class="section-card">
+        <div class="section-header">
+            <div class="section-title-wrapper">
+                <div class="section-icon">
+                    <i class="fas fa-award"></i>
+                </div>
+                <div>
+                    <h2 class="section-title">Certifications</h2>
+                    <p class="section-subtitle">Add professional certifications and credentials</p>
+                </div>
+            </div>
+            <button type="button" onclick="openModal('certificationModal')" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus mr-2"></i>
                 Add Certification
             </button>
         </div>
         
-        {% if certifications %}
-            <div class="bg-gray-50 rounded-lg divide-y divide-gray-200">
-                {% for certification in certifications %}
-                    <div class="p-4 hover:bg-gray-100">
-                        <div class="flex justify-between">
-                            <div>
-                                <h3 class="text-md font-medium text-gray-900">{{ certification.name }}</h3>
-                                <p class="text-sm text-gray-500">{{ certification.issuer }}</p>
-                                <p class="text-sm text-gray-500">
-                                    Issued: {{ certification.date_issued|date:"M Y" }}
-                                    {% if certification.expiration_date %}
-                                        - Expires: {{ certification.expiration_date|date:"M Y" }}
+        <div class="section-content">
+            {% if certifications %}
+                <div class="item-list">
+                    {% for certification in certifications %}
+                        <div class="item-card">
+                            <div class="item-header">
+                                <div class="item-title-wrapper">
+                                    <h3 class="item-title">{{ certification.name }}</h3>
+                                    <p class="item-subtitle">{{ certification.issuer }}</p>
+                                    <div class="item-meta">
+                                        <i class="fas fa-calendar-check item-meta-icon mr-1"></i>
+                                        Issued: {{ certification.date_issued|date:"M Y" }}
+                                        {% if certification.expiration_date %}
+                                            - Expires: {{ certification.expiration_date|date:"M Y" }}
+                                        {% endif %}
+                                    </div>
+                                    {% if certification.credential_id %}
+                                        <div class="item-meta mt-1">
+                                            <i class="fas fa-fingerprint item-meta-icon mr-1"></i>
+                                            ID: {{ certification.credential_id }}
+                                        </div>
                                     {% endif %}
-                                </p>
-                                {% if certification.credential_url %}
-                                    <a href="{{ certification.credential_url }}" target="_blank" class="text-sm text-primary hover:underline mt-1 inline-block">View Credential</a>
-                                {% endif %}
-                            </div>
-                            <div class="flex space-x-2">
-                                <button type="button" onclick="editCertification('{{ certification.id }}')" class="text-blue-600 hover:text-blue-800">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                </button>
-                                <form method="post" action="{% url 'edit_resume' resume.slug %}" class="inline" onsubmit="return confirm('Are you sure you want to delete this certification?');">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="section" value="certification">
-                                    <input type="hidden" name="action" value="delete">
-                                    <input type="hidden" name="id" value="{{ certification.id }}">
-                                    <button type="submit" class="text-red-600 hover:text-red-800">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
+                                </div>
+                                <div class="item-actions">
+                                    <button type="button" onclick="editCertification('{{ certification.id }}')" class="btn btn-icon btn-edit">
+                                        <i class="fas fa-pencil-alt"></i>
                                     </button>
-                                </form>
+                                    <form method="post" action="{% url 'edit_resume' resume.slug %}" class="inline" onsubmit="return confirm('Are you sure you want to delete this certification?');">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="section" value="certification">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id" value="{{ certification.id }}">
+                                        <button type="submit" class="btn btn-icon btn-delete">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
+                            {% if certification.credential_url %}
+                                <div class="mt-2">
+                                    <a href="{{ certification.credential_url }}" target="_blank" class="inline-flex items-center text-primary hover:underline">
+                                        <i class="fas fa-external-link-alt mr-1"></i>
+                                        View Credential
+                                    </a>
+                                </div>
+                            {% endif %}
                         </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="text-center py-4 bg-gray-50 rounded-lg">
-                <p class="text-gray-500">No certifications added yet. Click 'Add Certification' to get started.</p>
-            </div>
-        {% endif %}
-    </div>
-    
-    <div class="flex justify-between mt-8">
-        <a href="{% url 'dashboard' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-            Back to Dashboard
-        </a>
-        
-        <div>
-            <button id="exportPdfButton" onclick="generateResumePdf('{{ resume.slug }}')" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                <svg id="pdfSpinner" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Export as PDF
-            </button>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-award empty-icon"></i>
+                    <h3 class="empty-title">No Certifications Added Yet</h3>
+                    <p class="empty-description">Showcase your professional certifications to demonstrate your expertise</p>
+                    <button type="button" onclick="openModal('certificationModal')" class="btn btn-primary mt-4">
+                        <i class="fas fa-plus mr-2"></i>
+                        Add Certification
+                    </button>
+                </div>
+            {% endif %}
         </div>
     </div>
     
+    <div class="flex justify-between mb-16 mt-8">
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back to Dashboard
+        </a>
+    </div>
+    
+    <!-- Floating action button -->
+    <div class="floating-action-btn pulse" onclick="toggleActionMenu()">
+        <i class="fas fa-bolt"></i>
+    </div>
 </div>
 
 <!-- Education Modal -->
 <div id="educationModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeModal('educationModal')">&times;</span>
-        <h2 class="text-xl font-bold mb-4">Add Education</h2>
-        <form method="post" action="{% url 'edit_resume' resume.slug %}">
-            {% csrf_token %}
-            <input type="hidden" name="section" value="education">
-            <input type="hidden" name="action" value="add">
-            
-            <div class="grid grid-cols-1 gap-4">
-                <div>
-                    <label for="institution" class="block text-sm font-medium text-gray-700 mb-1">Institution</label>
-                    <input type="text" name="institution" id="institution" required class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
-                </div>
+        <div class="modal-header">
+            <div class="modal-icon">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div>
+                <h2 class="modal-title">Add Education</h2>
+                <p class="modal-subtitle">Add your academic qualifications</p>
+            </div>
+        </div>
+        <button class="close" onclick="closeModal('educationModal')">&times;</button>
+        
+        <div class="modal-body">
+            <form method="post" action="{% url 'edit_resume' resume.slug %}" id="educationForm">
+                {% csrf_token %}
+                <input type="hidden" name="section" value="education">
+                <input type="hidden" name="action" value="add">
+                <input type="hidden" name="id" id="education_id">
                 
-                <div>
-                    <label for="degree" class="block text-sm font-medium text-gray-700 mb-1">Degree</label>
-                    <input type="text" name="degree" id="degree" required class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
-                </div>
-                
-                <div>
-                    <label for="field_of_study" class="block text-sm font-medium text-gray-700 mb-1">Field of Study</label>
-                    <input type="text" name="field_of_study" id="field_of_study" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-                        <input type="date" name="start_date" id="start_date" required class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="form-group">
+                        <label for="institution" class="form-label">Institution</label>
+                        <input type="text" name="institution" id="institution" required class="form-control" placeholder="Harvard University, Stanford University, etc.">
+                        <p class="form-help">Enter the name of the school, college, or university</p>
                     </div>
                     
-                    <div>
-                        <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-                        <input type="date" name="end_date" id="end_date" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                    <div class="form-group">
+                        <label for="degree" class="form-label">Degree</label>
+                        <input type="text" name="degree" id="degree" required class="form-control" placeholder="Bachelor of Science, Master of Arts, etc.">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="field_of_study" class="form-label">Field of Study</label>
+                        <input type="text" name="field_of_study" id="field_of_study" class="form-control" placeholder="Computer Science, Business Administration, etc.">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-group">
+                            <label for="start_date" class="form-label">Start Date</label>
+                            <input type="date" name="start_date" id="start_date" required class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="end_date" class="form-label">End Date</label>
+                            <input type="date" name="end_date" id="end_date" class="form-control">
+                            <p class="form-help">Leave blank if this is your current education</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea name="description" id="description" rows="3" class="form-control" placeholder="Achievements, activities, relevant coursework, etc."></textarea>
                     </div>
                 </div>
-                
-                <div>
-                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <textarea name="description" id="description" rows="3" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"></textarea>
-                </div>
-                
-                <div class="flex justify-end">
-                    <button type="button" onclick="closeModal('educationModal')" class="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                        Cancel
-                    </button>
-                    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                        Add Education
-                    </button>
-                </div>
-            </div>
-        </form>
+            </form>
+        </div>
+        
+        <div class="modal-footer">
+            <button type="button" onclick="closeModal('educationModal')" class="btn btn-secondary">
+                Cancel
+            </button>
+            <button type="submit" form="educationForm" class="btn btn-primary">
+                <i class="fas fa-save mr-2"></i>
+                <span id="educationBtnText">Add Education</span>
+            </button>
+        </div>
     </div>
 </div>
 
 <!-- Experience Modal -->
 <div id="experienceModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeModal('experienceModal')">&times;</span>
-        <h2 class="text-xl font-bold mb-4">Add Experience</h2>
-        <form method="post" action="{% url 'edit_resume' resume.slug %}">
-            {% csrf_token %}
-            <input type="hidden" name="section" value="experience">
-            <input type="hidden" name="action" value="add">
-            
-            <div class="grid grid-cols-1 gap-4">
-                <div>
-                    <label for="company" class="block text-sm font-medium text-gray-700 mb-1">Company</label>
-                    <input type="text" name="company" id="company" required class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
-                </div>
+        <div class="modal-header">
+            <div class="modal-icon">
+                <i class="fas fa-briefcase"></i>
+            </div>
+            <div>
+                <h2 class="modal-title">Add Experience</h2>
+                <p class="modal-subtitle">Add your work experience</p>
+            </div>
+        </div>
+        <button class="close" onclick="closeModal('experienceModal')">&times;</button>
+        
+        <div class="modal-body">
+            <form method="post" action="{% url 'edit_resume' resume.slug %}" id="experienceForm">
+                {% csrf_token %}
+                <input type="hidden" name="section" value="experience">
+                <input type="hidden" name="action" value="add">
+                <input type="hidden" name="id" id="experience_id">
                 
-                <div>
-                    <label for="position" class="block text-sm font-medium text-gray-700 mb-1">Position</label>
-                    <input type="text" name="position" id="position" required class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
-                </div>
-                
-                <div>
-                    <label for="location" class="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                    <input type="text" name="location" id="location" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-                        <input type="date" name="start_date" id="exp_start_date" required class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="form-group">
+                        <label for="company" class="form-label">Company</label>
+                        <input type="text" name="company" id="company" required class="form-control" placeholder="Google, Microsoft, etc.">
                     </div>
                     
-                    <div>
-                        <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-                        <input type="date" name="end_date" id="exp_end_date" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                    <div class="form-group">
+                        <label for="position" class="form-label">Position</label>
+                        <input type="text" name="position" id="position" required class="form-control" placeholder="Software Engineer, Product Manager, etc.">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="location" class="form-label">Location</label>
+                        <input type="text" name="location" id="location" class="form-control" placeholder="New York, NY, Remote, etc.">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-group">
+                            <label for="exp_start_date" class="form-label">Start Date</label>
+                            <input type="date" name="start_date" id="exp_start_date" required class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="exp_end_date" class="form-label">End Date</label>
+                            <input type="date" name="end_date" id="exp_end_date" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="form-check">
+                        <input type="checkbox" name="current" id="current" class="form-check-input">
+                        <label for="current" class="form-check-label">I currently work here</label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="exp_description" class="form-label">Description</label>
+                        <textarea name="description" id="exp_description" rows="4" class="form-control" placeholder="Describe your responsibilities, achievements, and skills used"></textarea>
+                        <p class="form-help">Use bullet points or paragraphs to highlight key achievements</p>
                     </div>
                 </div>
-                
-                <div class="flex items-center">
-                    <input type="checkbox" name="current" id="current" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
-                    <label for="current" class="ml-2 block text-sm text-gray-700">I currently work here</label>
-                </div>
-                
-                <div>
-                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <textarea name="description" id="exp_description" rows="3" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"></textarea>
-                </div>
-                
-                <div class="flex justify-end">
-                    <button type="button" onclick="closeModal('experienceModal')" class="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                        Cancel
-                    </button>
-                    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                        Add Experience
-                    </button>
-                </div>
-            </div>
-        </form>
+            </form>
+        </div>
+        
+        <div class="modal-footer">
+            <button type="button" onclick="closeModal('experienceModal')" class="btn btn-secondary">
+                Cancel
+            </button>
+            <button type="submit" form="experienceForm" class="btn btn-primary">
+                <i class="fas fa-save mr-2"></i>
+                <span id="experienceBtnText">Add Experience</span>
+            </button>
+        </div>
     </div>
 </div>
 
 <!-- Skill Modal -->
 <div id="skillModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeModal('skillModal')">&times;</span>
-        <h2 class="text-xl font-bold mb-4">Add Skill</h2>
-        <form method="post" action="{% url 'edit_resume' resume.slug %}">
-            {% csrf_token %}
-            <input type="hidden" name="section" value="skill">
-            <input type="hidden" name="action" value="add">
-            
-            <div class="grid grid-cols-1 gap-4">
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Skill Name</label>
-                    <input type="text" name="name" id="skill_name" required class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
-                </div>
-                
-                <div>
-                    <label for="level" class="block text-sm font-medium text-gray-700 mb-1">Proficiency Level</label>
-                    <select name="level" id="level" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
-                        <option value="beginner">Beginner</option>
-                        <option value="intermediate" selected>Intermediate</option>
-                        <option value="advanced">Advanced</option>
-                        <option value="expert">Expert</option>
-                    </select>
-                </div>
-                
-                <div class="flex justify-end">
-                    <button type="button" onclick="closeModal('skillModal')" class="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                        Cancel
-                    </button>
-                    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                        Add Skill
-                    </button>
-                </div>
+        <div class="modal-header">
+            <div class="modal-icon">
+                <i class="fas fa-tools"></i>
             </div>
-        </form>
+            <div>
+                <h2 class="modal-title">Add Skill</h2>
+                <p class="modal-subtitle">Add your professional skills</p>
+            </div>
+        </div>
+        <button class="close" onclick="closeModal('skillModal')">&times;</button>
+        
+        <div class="modal-body">
+            <form method="post" action="{% url 'edit_resume' resume.slug %}" id="skillForm">
+                {% csrf_token %}
+                <input type="hidden" name="section" value="skill">
+                <input type="hidden" name="action" value="add">
+                
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="form-group">
+                        <label for="skill_name" class="form-label">Skill Name</label>
+                        <input type="text" name="name" id="skill_name" required class="form-control" placeholder="JavaScript, Project Management, etc.">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="level" class="form-label">Proficiency Level</label>
+                        <select name="level" id="level" class="form-control">
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate" selected>Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                            <option value="expert">Expert</option>
+                        </select>
+                        <p class="form-help">Select your skill level to help employers understand your expertise</p>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <div class="modal-footer">
+            <button type="button" onclick="closeModal('skillModal')" class="btn btn-secondary">
+                Cancel
+            </button>
+            <button type="submit" form="skillForm" class="btn btn-primary">
+                <i class="fas fa-plus mr-2"></i>
+                Add Skill
+            </button>
+        </div>
     </div>
 </div>
 
 <!-- Project Modal -->
 <div id="projectModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeModal('projectModal')">&times;</span>
-        <h2 class="text-xl font-bold mb-4">Add Project</h2>
-        <form method="post" action="{% url 'edit_resume' resume.slug %}">
-            {% csrf_token %}
-            <input type="hidden" name="section" value="project">
-            <input type="hidden" name="action" value="add">
-            
-            <div class="grid grid-cols-1 gap-4">
-                <div>
-                    <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Project Title</label>
-                    <input type="text" name="title" id="project_title" required class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
-                </div>
+        <div class="modal-header">
+            <div class="modal-icon">
+                <i class="fas fa-code-branch"></i>
+            </div>
+            <div>
+                <h2 class="modal-title">Add Project</h2>
+                <p class="modal-subtitle">Showcase your projects and accomplishments</p>
+            </div>
+        </div>
+        <button class="close" onclick="closeModal('projectModal')">&times;</button>
+        
+        <div class="modal-body">
+            <form method="post" action="{% url 'edit_resume' resume.slug %}" id="projectForm">
+                {% csrf_token %}
+                <input type="hidden" name="section" value="project">
+                <input type="hidden" name="action" value="add">
+                <input type="hidden" name="id" id="project_id">
                 
-                <div>
-                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <textarea name="description" id="project_description" rows="3" required class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"></textarea>
-                </div>
-                
-                <div>
-                    <label for="technologies" class="block text-sm font-medium text-gray-700 mb-1">Technologies Used</label>
-                    <input type="text" name="technologies" id="technologies" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
-                </div>
-                
-                <div>
-                    <label for="url" class="block text-sm font-medium text-gray-700 mb-1">Project URL</label>
-                    <input type="url" name="url" id="url" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-                        <input type="date" name="start_date" id="project_start_date" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="form-group">
+                        <label for="project_title" class="form-label">Project Title</label>
+                        <input type="text" name="title" id="project_title" required class="form-control" placeholder="Personal Website, Mobile App, etc.">
                     </div>
                     
-                    <div>
-                        <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-                        <input type="date" name="end_date" id="project_end_date" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                    <div class="form-group">
+                        <label for="technologies" class="form-label">Technologies Used</label>
+                        <input type="text" name="technologies" id="technologies" class="form-control" placeholder="React, Python, AWS, etc.">
+                        <p class="form-help">Separate multiple technologies with commas</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="project_description" class="form-label">Description</label>
+                        <textarea name="description" id="project_description" rows="3" required class="form-control" placeholder="Describe the project, your role, and the results"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="url" class="form-label">Project URL</label>
+                        <input type="url" name="url" id="url" class="form-control" placeholder="https://yourproject.com">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-group">
+                            <label for="project_start_date" class="form-label">Start Date</label>
+                            <input type="date" name="start_date" id="project_start_date" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="project_end_date" class="form-label">End Date</label>
+                            <input type="date" name="end_date" id="project_end_date" class="form-control">
+                            <p class="form-help">Leave blank for ongoing projects</p>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="flex justify-end">
-                    <button type="button" onclick="closeModal('projectModal')" class="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                        Cancel
-                    </button>
-                    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                        Add Project
-                    </button>
-                </div>
-            </div>
-        </form>
+            </form>
+        </div>
+        
+        <div class="modal-footer">
+            <button type="button" onclick="closeModal('projectModal')" class="btn btn-secondary">
+                Cancel
+            </button>
+            <button type="submit" form="projectForm" class="btn btn-primary">
+                <i class="fas fa-save mr-2"></i>
+                <span id="projectBtnText">Add Project</span>
+            </button>
+        </div>
     </div>
 </div>
 
 <!-- Certification Modal -->
 <div id="certificationModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeModal('certificationModal')">&times;</span>
-        <h2 class="text-xl font-bold mb-4">Add Certification</h2>
-        <form method="post" action="{% url 'edit_resume' resume.slug %}">
-            {% csrf_token %}
-            <input type="hidden" name="section" value="certification">
-            <input type="hidden" name="action" value="add">
-            
-            <div class="grid grid-cols-1 gap-4">
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Certification Name</label>
-                    <input type="text" name="name" id="cert_name" required class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
-                </div>
+        <div class="modal-header">
+            <div class="modal-icon">
+                <i class="fas fa-award"></i>
+            </div>
+            <div>
+                <h2 class="modal-title">Add Certification</h2>
+                <p class="modal-subtitle">Add your professional certifications</p>
+            </div>
+        </div>
+        <button class="close" onclick="closeModal('certificationModal')">&times;</button>
+        
+        <div class="modal-body">
+            <form method="post" action="{% url 'edit_resume' resume.slug %}" id="certificationForm">
+                {% csrf_token %}
+                <input type="hidden" name="section" value="certification">
+                <input type="hidden" name="action" value="add">
+                <input type="hidden" name="id" id="certification_id">
                 
-                <div>
-                    <label for="issuer" class="block text-sm font-medium text-gray-700 mb-1">Issuing Organization</label>
-                    <input type="text" name="issuer" id="issuer" required class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label for="date_issued" class="block text-sm font-medium text-gray-700 mb-1">Date Issued</label>
-                        <input type="date" name="date_issued" id="date_issued" required class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="form-group">
+                        <label for="cert_name" class="form-label">Certification Name</label>
+                        <input type="text" name="name" id="cert_name" required class="form-control" placeholder="AWS Certified Solutions Architect, Google Analytics, etc.">
                     </div>
                     
-                    <div>
-                        <label for="expiration_date" class="block text-sm font-medium text-gray-700 mb-1">Expiration Date</label>
-                        <input type="date" name="expiration_date" id="expiration_date" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
+                    <div class="form-group">
+                        <label for="issuer" class="form-label">Issuing Organization</label>
+                        <input type="text" name="issuer" id="issuer" required class="form-control" placeholder="Amazon Web Services, Google, etc.">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-group">
+                            <label for="date_issued" class="form-label">Date Issued</label>
+                            <input type="date" name="date_issued" id="date_issued" required class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="expiration_date" class="form-label">Expiration Date</label>
+                            <input type="date" name="expiration_date" id="expiration_date" class="form-control">
+                            <p class="form-help">Leave blank if certification doesn't expire</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="credential_id" class="form-label">Credential ID</label>
+                        <input type="text" name="credential_id" id="credential_id" class="form-control" placeholder="ABC123XYZ">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="credential_url" class="form-label">Credential URL</label>
+                        <input type="url" name="credential_url" id="credential_url" class="form-control" placeholder="https://credential.example.com/verify/ABC123XYZ">
+                        <p class="form-help">Link to verify your credential (if available)</p>
                     </div>
                 </div>
-                
-                <div>
-                    <label for="credential_id" class="block text-sm font-medium text-gray-700 mb-1">Credential ID</label>
-                    <input type="text" name="credential_id" id="credential_id" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
-                </div>
-                
-                <div>
-                    <label for="credential_url" class="block text-sm font-medium text-gray-700 mb-1">Credential URL</label>
-                    <input type="url" name="credential_url" id="credential_url" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
-                </div>
-                
-                <div class="flex justify-end">
-                    <button type="button" onclick="closeModal('certificationModal')" class="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                        Cancel
-                    </button>
-                    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                        Add Certification
-                    </button>
-                </div>
-            </div>
-        </form>
+            </form>
+        </div>
+        
+        <div class="modal-footer">
+            <button type="button" onclick="closeModal('certificationModal')" class="btn btn-secondary">
+                Cancel
+            </button>
+            <button type="submit" form="certificationForm" class="btn btn-primary">
+                <i class="fas fa-save mr-2"></i>
+                <span id="certificationBtnText">Add Certification</span>
+            </button>
+        </div>
     </div>
 </div>
+
+<!-- Action Menu Modal -->
+<div id="actionMenu" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-header">
+            <div class="modal-icon">
+                <i class="fas fa-bolt"></i>
+            </div>
+            <div>
+                <h2 class="modal-title">Quick Actions</h2>
+                <p class="modal-subtitle">Quickly add items to your resume</p>
+            </div>
+        </div>
+        <button class="close" onclick="closeModal('actionMenu')">&times;</button>
+        
+        <div class="modal-body">
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="openModal('educationModal'); closeModal('actionMenu');" class="btn btn-secondary flex flex-col items-center py-6 text-center">
+                    <i class="fas fa-graduation-cap text-2xl mb-2 text-primary"></i>
+                    <span>Add Education</span>
+                </button>
+                
+                <button onclick="openModal('experienceModal'); closeModal('actionMenu');" class="btn btn-secondary flex flex-col items-center py-6 text-center">
+                    <i class="fas fa-briefcase text-2xl mb-2 text-primary"></i>
+                    <span>Add Experience</span>
+                </button>
+                
+                <button onclick="openModal('skillModal'); closeModal('actionMenu');" class="btn btn-secondary flex flex-col items-center py-6 text-center">
+                    <i class="fas fa-tools text-2xl mb-2 text-primary"></i>
+                    <span>Add Skill</span>
+                </button>
+                
+                <button onclick="openModal('projectModal'); closeModal('actionMenu');" class="btn btn-secondary flex flex-col items-center py-6 text-center">
+                    <i class="fas fa-code-branch text-2xl mb-2 text-primary"></i>
+                    <span>Add Project</span>
+                </button>
+                
+                <button onclick="openModal('certificationModal'); closeModal('actionMenu');" class="btn btn-secondary flex flex-col items-center py-6 text-center">
+                    <i class="fas fa-award text-2xl mb-2 text-primary"></i>
+                    <span>Add Certification</span>
+                </button>
+                
+                <button onclick="generateResumePdf('{{ resume.slug }}'); closeModal('actionMenu');" class="btn btn-secondary flex flex-col items-center py-6 text-center">
+                    <i class="fas fa-file-pdf text-2xl mb-2 text-primary"></i>
+                    <span>Export PDF</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -646,10 +1549,12 @@
     // Modal functions
     function openModal(modalId) {
         document.getElementById(modalId).style.display = "block";
+        document.body.style.overflow = "hidden";
     }
 
     function closeModal(modalId) {
         document.getElementById(modalId).style.display = "none";
+        document.body.style.overflow = "auto";
     }
 
     // Close modals when clicking outside
@@ -658,6 +1563,7 @@
         for (let i = 0; i < modals.length; i++) {
             if (event.target == modals[i]) {
                 modals[i].style.display = "none";
+                document.body.style.overflow = "auto";
             }
         }
     }
@@ -674,6 +1580,84 @@
                     endDateInput.value = '';
                 }
             });
+        }
+    });
+    
+    // Toggle action menu
+    function toggleActionMenu() {
+        openModal('actionMenu');
+    }
+    
+    // Edit functions
+    function editEducation(id) {
+        // Reset form
+        document.getElementById("educationForm").reset();
+        
+        // Set form action to edit
+        document.querySelector('#educationForm input[name="action"]').value = 'edit';
+        document.getElementById('education_id').value = id;
+        document.getElementById('educationBtnText').textContent = 'Save Changes';
+        
+        // Here you would typically fetch the education data and populate the form
+        // For example purposes, this would involve an AJAX call to get the data
+        
+        openModal('educationModal');
+    }
+    
+    function editExperience(id) {
+        // Reset form
+        document.getElementById("experienceForm").reset();
+        
+        // Set form action to edit
+        document.querySelector('#experienceForm input[name="action"]').value = 'edit';
+        document.getElementById('experience_id').value = id;
+        document.getElementById('experienceBtnText').textContent = 'Save Changes';
+        
+        openModal('experienceModal');
+    }
+    
+    function editProject(id) {
+        // Reset form
+        document.getElementById("projectForm").reset();
+        
+        // Set form action to edit
+        document.querySelector('#projectForm input[name="action"]').value = 'edit';
+        document.getElementById('project_id').value = id;
+        document.getElementById('projectBtnText').textContent = 'Save Changes';
+        
+        openModal('projectModal');
+    }
+    
+    function editCertification(id) {
+        // Reset form
+        document.getElementById("certificationForm").reset();
+        
+        // Set form action to edit
+        document.querySelector('#certificationForm input[name="action"]').value = 'edit';
+        document.getElementById('certification_id').value = id;
+        document.getElementById('certificationBtnText').textContent = 'Save Changes';
+        
+        openModal('certificationModal');
+    }
+    
+    // Add smooth scrolling
+    document.addEventListener('DOMContentLoaded', function() {
+        const links = document.querySelectorAll('a[href^="#"]');
+        
+        for (const link of links) {
+            link.addEventListener('click', clickHandler);
+        }
+        
+        function clickHandler(e) {
+            e.preventDefault();
+            const href = this.getAttribute('href');
+            const target = document.querySelector(href);
+            
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
         }
     });
 </script>
